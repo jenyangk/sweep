@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0a0a0b" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+    <meta name="color-scheme" content="dark light" />
+
+    <!-- Theme bootstrap — runs before paint to prevent FOUC -->
+    <script data-sweep-theme-bootstrap>
+      (() => {
+        let theme;
+        try {
+          const stored = localStorage.getItem("sweep-theme");
+          if (stored === "light" || stored === "dark") theme = stored;
+        } catch {}
+        if (!theme) {
+          theme = window.matchMedia?.("(prefers-color-scheme: light)").matches
+            ? "light"
+            : "dark";
+        }
+        document.documentElement.dataset.theme = theme;
+        document.documentElement.style.colorScheme = theme;
+      })();
+    </script>
+
+    <!-- Satoshi font — self-hosted, preloaded for fast first paint -->
+    <link rel="preload" href="/fonts/satoshi-400.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/satoshi-700.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="/src/styles/global.css" />
+
+    <!-- Primary SEO -->
+    <title>sweep — batch QR scanner. Camera, upload, base64.</title>
+    <meta
+      name="description"
+      content="Free batch QR code scanner. Scan multiple QR codes in a row with your camera, upload image files, or paste base64-encoded image text. Decodes URL, text, vCard, WiFi, base64. Runs entirely in your browser. No signup, no upload, no server."
+    />
+    <meta
+      name="keywords"
+      content="qr scanner, batch qr scanner, scan multiple qr codes, qr code reader, upload image qr, base64 qr decoder, qr scanner online, free qr scanner"
+    />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta name="application-name" content="sweep" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="sweep" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <link rel="canonical" href="https://sweep-app.github.io/" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="sitemap" href="/sitemap.xml" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:site_name" content="sweep" />
+    <meta property="og:url" content="https://sweep-app.github.io/" />
+    <meta property="og:title" content="sweep — batch QR scanner" />
+    <meta
+      property="og:description"
+      content="Scan multiple QR codes in a row with your camera, upload image files, or paste base64 image text. Decodes URL, text, vCard, WiFi, base64. Free, no signup, all client-side."
+    />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="sweep — batch QR scanner" />
+    <meta
+      name="twitter:description"
+      content="Scan multiple QR codes in a row with your camera, upload image files, or paste base64 image text. Free, no signup, all client-side."
+    />
+
+    <!-- Structured data: WebApplication -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "@id": "https://sweep-app.github.io/#application",
+        "name": "sweep",
+        "url": "https://sweep-app.github.io/",
+        "description": "Free batch QR code scanner. Scan multiple QR codes in a row with your camera, upload image files, or paste base64-encoded image text. Decodes URL, text, vCard, WiFi, base64. All processing happens in your browser.",
+        "applicationCategory": "UtilitiesApplication",
+        "applicationSubCategory": "QR code scanner",
+        "operatingSystem": "Any",
+        "browserRequirements": "Requires a modern web browser with camera access (getUserMedia) and JavaScript enabled.",
+        "isAccessibleForFree": true,
+        "offers": {
+          "@type": "Offer",
+          "price": 0,
+          "priceCurrency": "USD"
+        },
+        "featureList": [
+          "Continuous camera scanning — scan multiple QR codes without stopping",
+          "Upload image files (PNG, JPG, WebP, GIF) to decode QR codes",
+          "Paste base64-encoded image text to decode QR codes",
+          "Multi-format content decoding: URL, text, vCard, WiFi, base64",
+          "CSV export of all scanned results",
+          "All processing client-side — no uploads, no server, complete privacy",
+          "Works on mobile and desktop browsers",
+          "Dark and light theme"
+        ]
+      }
+    </script>
+
+    <!-- HowTo structured data for AEO -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "HowTo",
+        "name": "How to scan multiple QR codes with sweep",
+        "description": "Scan multiple QR codes in a row, or decode QR codes from uploaded image files and base64 text.",
+        "step": [
+          {
+            "@type": "HowToStep",
+            "name": "Open the scanner",
+            "text": "Click Start camera. Your browser asks for camera permission. Allow it to begin scanning."
+          },
+          {
+            "@type": "HowToStep",
+            "name": "Scan QR codes",
+            "text": "Point your camera at QR codes one after another. Each decoded code is added to the results list automatically."
+          },
+          {
+            "@type": "HowToStep",
+            "name": "Upload an image",
+            "text": "Click Upload image and choose a PNG, JPG, WebP, or GIF file containing a QR code. sweep decodes it instantly."
+          },
+          {
+            "@type": "HowToStep",
+            "name": "Paste base64 image text",
+            "text": "Click Paste base64 and paste a base64-encoded image string. sweep decodes the QR code from the image data."
+          },
+          {
+            "@type": "HowToStep",
+            "name": "Export results",
+            "text": "Click Export CSV to download all scanned results as a spreadsheet-ready file."
+          }
+        ]
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root">
+      <!-- Server-rendered fallback for no-JS users and crawlers -->
+      <header class="sr-header">
+        <a href="/" class="sr-logo">sweep</a>
+      </header>
+      <main class="sr-main">
+        <h1>Batch QR scanner. Camera, upload, base64.</h1>
+        <p>Scan multiple QR codes in a row with your camera, upload image files, or paste base64-encoded image text. Everything runs in your browser. No signup, no upload, no server.</p>
+        <noscript>
+          <p style="margin-top:24px;color:#b8ff5a;font-weight:700">sweep needs JavaScript to scan QR codes. Please enable JavaScript.</p>
+        </noscript>
+      </main>
+    </div>
+    <script type="module" src="/src/entry-client.ts"></script>
+  </body>
+</html>
