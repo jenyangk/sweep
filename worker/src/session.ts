@@ -101,19 +101,30 @@ export class SessionDO extends DurableObject<Env> {
 
   // Echo relay: forward every message to all other attached sockets.
   // Messages stay opaque — ticket #3's encrypted payloads relay unchanged.
-  // Extra (third+) sockets are rejected here on their first message: their
-  // hello is not relayed, and the close handshake completes in
-  // webSocketClose so the client sees code 4001 "session full".
+  // Extra (third+) sockets are excluded from forwarding AND rejected here
+  // on their first message: their hello is not relayed, and the close
+  // handshake completes in webSocketClose so the client sees code 4001
+  // "session full". Excluding them from the forward list matters before
+  // their first message arrives — a not-yet-rejected extra socket must not
+  // eavesdrop on the paired session.
   webSocketMessage(ws: WebSocket, message: string | ArrayBuffer): void {
     const tag = ws.deserializeAttachment() as { extra?: boolean } | null;
     if (tag?.extra) {
       ws.close(SESSION_FULL_CODE, SESSION_FULL_REASON);
       return;
     }
-    const others = this.ctx.getWebSockets().filter((s) => s !== ws);
+    const others = this.ctx
+      .getWebSockets()
+      .filter((s) => s !== ws && !this.isExtra(s));
     for (const socket of others) {
       socket.send(message);
     }
+  }
+
+  // True for sockets tagged as extra (third+) in fetch().
+  isExtra(ws: WebSocket): boolean {
+    const tag = ws.deserializeAttachment() as { extra?: boolean } | null;
+    return tag?.extra === true;
   }
 
   webSocketClose(
@@ -149,8 +160,7 @@ export class SessionDO extends DurableObject<Env> {
   // When the last socket closes there is no one to tell, and with no
   // durable state the session is simply gone (ephemeral).
   notifyPeerLeft(ws: WebSocket): void {
-    const tag = ws.deserializeAttachment() as { extra?: boolean } | null;
-    if (tag?.extra) return;
+    if (this.isExtra(ws)) return;
     const remaining = this.ctx
       .getWebSockets()
       .filter((socket) => socket !== ws);
