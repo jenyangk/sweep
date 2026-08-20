@@ -624,6 +624,25 @@ tbody tr:last-child td {
   border-color: color-mix(in oklch, var(--accent) 50%, var(--border));
 }
 
+/* ----- Source tag (paired-device sync, #3) ----- */
+.source-tag {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 2px 8px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.source-tag.source-remote {
+  color: var(--accent);
+  border-color: color-mix(in oklch, var(--accent) 50%, var(--border));
+}
+
 /* ----- Empty state ----- */
 .empty-state {
   text-align: center;
@@ -668,7 +687,7 @@ tbody tr:last-child td {
 }
 
 /* Results table column widths (fixed layout reads widths from the first row).
-   Columns: #, time, type, content, remove. */
+   Columns: #, time, type, content, source, remove. */
 .results-scroll th:nth-child(1),
 .results-scroll td:nth-child(1) {
   width: 5%;
@@ -682,18 +701,24 @@ tbody tr:last-child td {
 
 .results-scroll th:nth-child(3),
 .results-scroll td:nth-child(3) {
-  width: 15%;
+  width: 13%;
 }
 
 .results-scroll th:nth-child(4),
 .results-scroll td:nth-child(4) {
-  width: 50%;
+  width: 45%;
+}
+
+.results-scroll th:nth-child(5),
+.results-scroll td:nth-child(5) {
+  width: 14%;
+  white-space: nowrap;
 }
 
 /* !important overrides the inline width:1px on the remove-column header cell
    (app.ts), which would otherwise collapse that column in fixed layout. */
-.results-scroll th:nth-child(5),
-.results-scroll td:nth-child(5) {
+.results-scroll th:nth-child(6),
+.results-scroll td:nth-child(6) {
   width: 10% !important;
 }
 

@@ -1,9 +1,22 @@
 import type { ParsedQr } from "./parse-qr";
 
+export type ScanSource = "local" | "remote";
+
 export interface ScanRecord {
   id: string;
   timestamp: number;
   parsed: ParsedQr;
+  /**
+   * Where the scan came from: "local" (camera/upload/paste on this device)
+   * or "remote" (synced from the paired device over the encrypted session).
+   * Labels appear in the results table and CSV/TXT exports.
+   */
+  source: ScanSource;
+}
+
+/** Human-readable origin label for exports (CSV/TXT). */
+export function describeSource(source: ScanSource): string {
+  return source === "remote" ? "paired device" : "this device";
 }
 
 function csvCell(s: unknown): string {
@@ -13,12 +26,12 @@ function csvCell(s: unknown): string {
 }
 
 export function toCsv(records: ScanRecord[]): string {
-  const header = ["#", "timestamp", "type", "content", "fields"];
+  const header = ["#", "timestamp", "type", "content", "fields", "source"];
   const rows = records.map((r, i) => {
     const fields = Object.entries(r.parsed.fields)
       .map(([k, v]) => `${k}=${v}`)
       .join("; ");
-    return [i + 1, new Date(r.timestamp).toISOString(), r.parsed.type, r.parsed.raw, fields];
+    return [i + 1, new Date(r.timestamp).toISOString(), r.parsed.type, r.parsed.raw, fields, describeSource(r.source)];
   });
   return [header, ...rows].map((row) => row.map(csvCell).join(",")).join("\r\n");
 }
@@ -30,7 +43,8 @@ export function toTxt(records: ScanRecord[]): string {
       const fields = Object.entries(r.parsed.fields)
         .map(([k, v]) => `  ${k}: ${v}`)
         .join("\n");
-      return `[${i + 1}] ${time}\n${r.parsed.type}\n${r.parsed.raw}${fields ? "\n" + fields : ""}`;
+      const origin = `  (from ${describeSource(r.source)})`;
+      return `[${i + 1}] ${time}\n${r.parsed.type}${origin}\n${r.parsed.raw}${fields ? "\n" + fields : ""}`;
     })
     .join("\n\n");
 }

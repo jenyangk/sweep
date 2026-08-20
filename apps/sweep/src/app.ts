@@ -5,8 +5,17 @@ import {
   downloadCsv,
   downloadTxt,
   copyResults,
+  describeSource,
   type ScanRecord,
+  type ScanSource,
 } from "./lib/output";
+import {
+  generateSessionKey,
+  exportKeyToBase64,
+  importKeyFromBase64,
+  encryptScan,
+  decryptScan,
+} from "./lib/crypto";
 import {
   startCamera,
   decodeImageFile,
@@ -168,7 +177,11 @@ export function initApp(): void {
     {
       class: "btn btn-ghost btn-sm",
       id: "pair-device",
-      onClick: () => pairDevice(),
+      onClick: () => {
+        pairDevice().catch(() => {
+          logSync("could not create a session key — pairing aborted");
+        });
+      },
     },
     [icons.qr, "Pair device"],
   );
@@ -311,6 +324,7 @@ export function initApp(): void {
       el("span", { class: "ghost-cell ghost-time" }, "00:00:00"),
       el("span", { class: "ghost-cell" }, "type"),
       el("span", { class: "ghost-cell ghost-content" }, "scanned content appears here"),
+      el("span", { class: "ghost-cell" }, "source"),
       el("span", { class: "ghost-cell" }, ""),
     ],
   );
@@ -334,15 +348,37 @@ export function initApp(): void {
   root.append(header, main);
 
   // ----- State mutations -----
-  function addScan(parsed: ParsedQr): void {
+  //
+  // addScan is the single injection point for a scan into local state.
+  // Ticket #3: local-origin scans (camera/upload/paste) are encrypted and
+  // broadcast to the paired device; remote-origin scans (decrypted from
+  // the wire) are NOT re-broadcast — that would echo them back to the
+  // sender and loop forever.
+  async function addScan(
+    parsed: ParsedQr,
+    source: ScanSource = "local",
+    timestamp: number = Date.now(),
+  ): Promise<void> {
     const record: ScanRecord = {
       id: newId(),
-      timestamp: Date.now(),
+      timestamp,
       parsed,
+      source,
     };
     state.records.unshift(record);
     renderResults();
     flashReticle();
+    if (source === "local" && syncHandle && syncKey) {
+      try {
+        syncHandle.send(await encryptScan(syncKey, {
+          parsed: record.parsed,
+          timestamp: record.timestamp,
+        }));
+      } catch {
+        // Encryption failure is not fatal to the local scan; the peer just
+        // won't see this one.
+      }
+    }
   }
 
   function flashReticle(): void {
@@ -385,6 +421,7 @@ export function initApp(): void {
         el("th", {}, "Time"),
         el("th", {}, "Type"),
         el("th", {}, "Content"),
+        el("th", {}, "Source"),
         el("th", { style: { width: "1px" } }),
       ])),
       el("tbody", {}, state.records.map((r, i) => makeRow(r, i))),
@@ -409,6 +446,7 @@ export function initApp(): void {
       el("td", { style: { whiteSpace: "nowrap" } }, new Date(r.timestamp).toLocaleTimeString()),
       el("td", {}, el("span", { class: "type-tag", dataset: { type: r.parsed.type } }, describeType(r.parsed.type))),
       el("td", {}, summarize(r.parsed)),
+      el("td", {}, el("span", { class: `source-tag source-${r.source}` }, describeSource(r.source))),
       el("td", {}, removeBtn),
     ]);
     return row;
@@ -608,6 +646,11 @@ export function initApp(): void {
 
   // ----- Session sync -----
   let syncHandle: SyncHandle | null = null;
+  // Shared AES-GCM session key (#3). Set on the host when pairing (the
+  // exported key rides in the QR as ?k=<base64>) and on the phone when a
+  // scanned join URL yields one. Held in memory only — the session is
+  // ephemeral, so the key dies with the page.
+  let syncKey: CryptoKey | null = null;
   // Which pairing panel to show:
   //   waiting — host's QR is up, waiting for the first peer
   //   paired  — the session reached 1:1, show "Paired with a device"
@@ -661,7 +704,34 @@ export function initApp(): void {
       pairState = "ended";
       logSync("peer left — session ended");
       renderPairPanel();
+    } else if (message.type === "scan") {
+      // #3: an encrypted scan from the paired device. The relay only ever
+      // relayed {type:"scan", ct, iv}; decrypt here and inject as a
+      // remote-origin record. The decrypt+addScan failure path surfaces in
+      // the sync log instead of crashing the page.
+      void receiveRemoteScan(message).catch((err: unknown) => {
+        logSync(`bad scan from peer: ${err instanceof Error ? err.message : String(err)}`);
+      });
     }
+  }
+
+  // Decrypt a {type:"scan", ct, iv} envelope from the paired device and
+  // inject it as a remote-origin record via addScan. Never re-broadcast:
+  // addScan is called with source "remote", so the broadcast branch is
+  // skipped — the scan cannot echo back to the sender (no loop).
+  async function receiveRemoteScan(message: SyncMessage): Promise<void> {
+    if (!syncKey) throw new Error("no session key for this pairing");
+    const ct = typeof message.ct === "string" ? message.ct : "";
+    const iv = typeof message.iv === "string" ? message.iv : "";
+    if (!ct || !iv) throw new Error("missing ciphertext or iv");
+    const payload = await decryptScan<{ parsed?: ParsedQr; timestamp?: number }>(syncKey, ct, iv);
+    if (!payload || !payload.parsed) throw new Error("payload has no parsed scan");
+    await addScan(
+      payload.parsed,
+      "remote",
+      typeof payload.timestamp === "number" ? payload.timestamp : Date.now(),
+    );
+    logSync("scan received from paired device");
   }
 
   function startSync(sessionId: string): void {
@@ -687,17 +757,36 @@ export function initApp(): void {
   function joinFromScan(raw: string): boolean {
     const parsed = parseJoinUrl(raw, window.location.origin);
     if (!parsed) return false;
-    startSync(parsed.sessionId);
-    // #3 (crypto) will read parsed.extra.k here to encrypt the session.
+    // #3: the join URL carries the session's AES-GCM key as ?k=<base64>.
+    // Import it (memory-only, ephemeral session) or refuse to join — an
+    // unencrypted session would leak scans through the relay.
+    const keyB64 = parsed.extra.k;
+    if (!keyB64) {
+      logSync("join URL carries no session key — pairing rejected");
+      closeScanner();
+      return false;
+    }
     closeScanner();
-    logSync(`joined session from scan: ${parsed.sessionId.slice(0, 8)}`);
+    importKeyFromBase64(keyB64)
+      .then((key) => {
+        syncKey = key;
+        startSync(parsed.sessionId);
+        logSync(`joined session from scan: ${parsed.sessionId.slice(0, 8)}`);
+      })
+      .catch(() => {
+        logSync("session key from QR is invalid — pairing rejected");
+      });
     return true;
   }
 
-  function pairDevice(): void {
+  async function pairDevice(): Promise<void> {
     const sessionId = crypto.randomUUID();
+    // #3: a fresh AES-GCM key per pairing, exported into the QR payload.
+    // The phone imports it from the scan; the relay never sees it.
+    const key = await generateSessionKey();
+    syncKey = key;
     startSync(sessionId);
-    const url = joinUrl(sessionId);
+    const url = joinUrl(sessionId, { k: await exportKeyToBase64(key) });
     clear(qrBox);
     const svg = el("div", { class: "qr-svg" });
     svg.append(renderQrSvg(url));

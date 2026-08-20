@@ -10,7 +10,15 @@
 // encryption): #3 adds an AES key as an extra search param (?k=<key>), which
 // round-trips through the `extra` record untouched.
 //
+// Ticket #3 (end-to-end encryption): the QR payload now carries a session
+// key (extra.k, see lib/crypto.ts). Scans travel as {type:"scan", ct, iv}
+// encrypted envelopes; the relay only ever sees ciphertext. The URL seam
+// (buildJoinUrl/parseJoinUrl/joinUrl) and the opaque message pipe needed no
+// protocol changes.
+//
 // This module is DOM-free — the UI wiring lives in app.ts.
+
+import type { EncryptedEnvelope } from "./crypto";
 
 export type SyncStatus = "idle" | "connecting" | "connected" | "closed";
 
@@ -21,14 +29,15 @@ export const SESSION_FULL_CODE = 4001;
 
 export interface SyncMessage {
   type: string;
-  peerId: string;
+  /** Sender identity — present on hello frames, not needed on scan frames. */
+  peerId?: string;
   [key: string]: unknown;
 }
 
 export interface SyncHandle {
   readonly sessionId: string;
   readonly peerId: string;
-  send(message: SyncMessage): void;
+  send(message: SyncMessage | EncryptedEnvelope): void;
   close(): void;
 }
 
@@ -39,15 +48,29 @@ export interface SyncOptions {
   onRejected?(code: number, reason: string): void;
 }
 
+export interface ConnectSessionOptions extends SyncOptions {
+  /**
+   * WebSocket URL override (tests and smoke scripts). Defaults to the
+   * relative /ws?s=<session-id> on this origin.
+   */
+  wsUrl?: string;
+  /**
+   * peerId override (tests). Defaults to a random UUID.
+   */
+  peerId?: string;
+}
+
 // Open a WebSocket to the session relay for `sessionId` and send a hello
 // on connect. The relay echoes messages to other sockets in the session;
 // this tab never receives its own messages back.
 export function connectSession(
   sessionId: string,
-  options: SyncOptions,
+  options: ConnectSessionOptions,
 ): SyncHandle {
-  const peerId = crypto.randomUUID();
-  const ws = new WebSocket(`/ws?s=${encodeURIComponent(sessionId)}`);
+  const peerId = options.peerId ?? crypto.randomUUID();
+  const ws = new WebSocket(
+    options.wsUrl ?? `/ws?s=${encodeURIComponent(sessionId)}`,
+  );
 
   ws.addEventListener("open", () => {
     options.onStatus("connected");
@@ -76,7 +99,7 @@ export function connectSession(
   return {
     sessionId,
     peerId,
-    send(message: SyncMessage): void {
+    send(message: SyncMessage | EncryptedEnvelope): void {
       if (ws.readyState === WebSocket.OPEN) {
         ws.send(JSON.stringify(message));
       }
@@ -91,7 +114,7 @@ export function connectSession(
 //
 // The pairing QR encodes a join URL: <origin>/?s=<session-id>[&<extra>].
 // `extra` is opaque key/value map carried verbatim into the URL — the
-// extension seam for #3, which will add an AES key as ?k=<key>.
+// #3 crypto seam, which puts the shared AES key in ?k=<base64>.
 
 export interface ParsedJoinUrl {
   sessionId: string;
@@ -141,8 +164,9 @@ export function parseJoinUrl(
 
 // The URL a second tab should open to join the same session. DOM-bound
 // (uses window.location); the pure buildJoinUrl covers non-DOM callers.
-export function joinUrl(sessionId: string): string {
-  return buildJoinUrl(window.location.origin, sessionId);
+// `extra` carries the #3 session key (?k=<base64>) into the QR payload.
+export function joinUrl(sessionId: string, extra: Record<string, string> = {}): string {
+  return buildJoinUrl(window.location.origin, sessionId, extra);
 }
 
 // Session id from the URL (?s=<session-id>), if present.
