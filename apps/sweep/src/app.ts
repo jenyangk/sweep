@@ -17,6 +17,14 @@ import {
   type ScanStatus,
 } from "./lib/scan";
 import { icons } from "./icons";
+import {
+  connectSession,
+  joinUrl,
+  sessionIdFromUrl,
+  type SyncHandle,
+  type SyncMessage,
+  type SyncStatus,
+} from "./lib/sync";
 
 interface AppState {
   records: ScanRecord[];
@@ -146,6 +154,35 @@ export function initApp(): void {
 
   const hero = el("section", { class: "page-enter" }, [h1, subhead, actions]);
 
+  // ----- Session sync (pair device) -----
+  const syncStatusPill = el(
+    "span",
+    { class: "pill", dataset: { status: "idle" } },
+    [el("span", { class: "dot" }), "Off"],
+  );
+  const syncLog = el("div", { class: "sync-log", ariaLive: "polite" });
+  const pairBtn = el(
+    "button",
+    {
+      class: "btn btn-ghost btn-sm",
+      id: "pair-device",
+      onClick: () => pairDevice(),
+    },
+    [icons.link, "Pair device"],
+  );
+  const syncPanel = el("div", { class: "panel sync-panel" }, [
+    el("div", { class: "row", style: { justifyContent: "space-between" } }, [
+      el("span", { class: "label" }, "session relay"),
+      syncStatusPill,
+    ]),
+    el("div", { class: "row", style: { marginTop: "12px" } }, [pairBtn]),
+    syncLog,
+  ]);
+  const syncSection = el("section", { class: "section-gap" }, [
+    el("p", { class: "section-label" }, "// pair"),
+    syncPanel,
+  ]);
+
   // ----- Scanner section (hidden until opened) -----
   const video = el("video", {
     ariaLabel: "Camera preview for QR scanning",
@@ -274,6 +311,7 @@ export function initApp(): void {
 
   const main = el("main", {}, [
     hero,
+    syncSection,
     scannerSection,
     resultsSection,
   ]);
@@ -547,6 +585,57 @@ export function initApp(): void {
     input.focus();
     on(dialog, "cancel", close);
   }
+
+  // ----- Session sync -----
+  let syncHandle: SyncHandle | null = null;
+
+  function setSyncStatus(status: SyncStatus): void {
+    syncStatusPill.dataset.status = status;
+    const label =
+      status === "connected"
+        ? "Connected"
+        : status === "connecting"
+          ? "Connecting"
+          : status === "closed"
+            ? "Closed"
+            : "Off";
+    clear(syncStatusPill);
+    syncStatusPill.append(el("span", { class: "dot" }), document.createTextNode(label));
+  }
+
+  function logSync(text: string): void {
+    const line = el("div", { class: "sync-line" }, text);
+    syncLog.append(line);
+    syncLog.scrollTop = syncLog.scrollHeight;
+  }
+
+  function handleSyncMessage(message: SyncMessage): void {
+    if (message.type === "hello") {
+      logSync(`hello from ${String(message.peerId).slice(0, 8)}`);
+    }
+  }
+
+  function startSync(sessionId: string): void {
+    if (syncHandle) syncHandle.close();
+    clear(syncLog);
+    setSyncStatus("connecting");
+    syncHandle = connectSession(sessionId, {
+      onMessage: handleSyncMessage,
+      onStatus: setSyncStatus,
+    });
+    logSync(`joined session ${sessionId.slice(0, 8)}`);
+  }
+
+  function pairDevice(): void {
+    const sessionId = crypto.randomUUID();
+    startSync(sessionId);
+    const url = joinUrl(sessionId);
+    logSync(`share this link to pair: ${url}`);
+  }
+
+  // Auto-join a session from the URL (?s=<session-id>).
+  const urlSessionId = sessionIdFromUrl();
+  if (urlSessionId) startSync(urlSessionId);
 
   renderResults();
 }

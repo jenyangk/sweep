@@ -36,3 +36,13 @@ binding = "ASSETS"
 run_worker_first = true
 html_handling = "auto-trailing-slash"
 not_found_handling = "404-page"
+
+# Durable Object: per-session WebSocket relay (worker/src/session.ts).
+# One instance per session-id, created lazily on first upgrade.
+[[durable_objects.bindings]]
+name = "SWEEP_SESSION"
+class_name = "SessionDO"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["SessionDO"]

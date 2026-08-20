@@ -21,14 +21,27 @@
 //
 // Each app is built with Vite `base: '/'` so absolute asset paths (/assets/...,
 // /fonts/...) resolve correctly at the subdomain root after rewriting.
+//
+// WebSocket upgrades: /ws?s=<session-id> is routed to the SessionDO for that
+// session-id (see session.ts). The Upgrade header is validated first so
+// non-WebSocket requests never reach the Durable Object (every DO request
+// is billed, even invalid ones).
 
-interface Env {
-  ASSETS: Fetcher;
-}
+import { SessionDO } from "./session";
+import type { Env } from "./env";
+
+export { SessionDO };
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
+
+    // WebSocket upgrades are host-agnostic (the sweep app connects to its
+    // own origin), so route them before host-based static routing.
+    if (url.pathname === "/ws") {
+      return handleWebSocket(request, env);
+    }
+
     // Prefer the Host header (authoritative in production, and the only way
     // to get the requested hostname in local dev where request.url points
     // at 127.0.0.1). Fall back to the URL hostname if absent.
@@ -60,3 +73,23 @@ export default {
     return env.ASSETS.fetch(new Request(rewritten, request));
   },
 };
+
+// Route a WebSocket upgrade to the SessionDO for the session-id in the
+// query string. Returns 426 Upgrade Required for non-WebSocket requests so
+// they never reach (and are never billed against) the Durable Object.
+async function handleWebSocket(request: Request, env: Env): Promise<Response> {
+  const upgrade = request.headers.get("upgrade");
+  if (upgrade === null || upgrade.toLowerCase() !== "websocket") {
+    return new Response("Expected Upgrade: websocket", { status: 426 });
+  }
+
+  const sessionId = new URL(request.url).searchParams.get("s");
+  if (!sessionId) {
+    return new Response("Missing session id (?s=<session-id>)", {
+      status: 400,
+    });
+  }
+
+  const stub = env.SWEEP_SESSION.getByName(sessionId);
+  return stub.fetch(request);
+}

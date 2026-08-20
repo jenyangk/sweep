@@ -304,6 +304,52 @@ footer {
   padding: 20px;
 }
 
+/* ----- Session sync (pair device) ----- */
+.sync-panel {
+  max-width: 560px;
+}
+
+.sync-log {
+  margin-top: 12px;
+  max-height: 140px;
+  overflow-y: auto;
+  font-family: var(--mono, ui-monospace, monospace);
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--muted);
+  word-break: break-all;
+}
+
+.sync-line {
+  padding: 2px 0;
+}
+
+.pill[data-status="connected"] {
+  color: var(--success);
+  border-color: color-mix(in oklch, var(--success) 40%, var(--border));
+}
+.pill[data-status="connected"] .dot {
+  background: var(--success);
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+.pill[data-status="connecting"] {
+  color: var(--accent);
+  border-color: color-mix(in oklch, var(--accent) 40%, var(--border));
+}
+.pill[data-status="connecting"] .dot {
+  background: var(--accent);
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+.pill[data-status="closed"] {
+  color: var(--danger);
+  border-color: color-mix(in oklch, var(--danger) 40%, var(--border));
+}
+.pill[data-status="closed"] .dot {
+  background: var(--danger);
+}
+
 /* ----- Inputs ----- */
 input,
 select,
