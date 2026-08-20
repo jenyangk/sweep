@@ -21,10 +21,12 @@ import {
   connectSession,
   joinUrl,
   sessionIdFromUrl,
+  parseJoinUrl,
   type SyncHandle,
   type SyncMessage,
   type SyncStatus,
 } from "./lib/sync";
+import { renderQrSvg } from "./lib/qr";
 
 interface AppState {
   records: ScanRecord[];
@@ -168,14 +170,27 @@ export function initApp(): void {
       id: "pair-device",
       onClick: () => pairDevice(),
     },
-    [icons.link, "Pair device"],
+    [icons.qr, "Pair device"],
   );
+  const qrBox = el("div", { class: "qr-box" });
+  const pairedBox = el(
+    "div",
+    { class: "paired-box" },
+    [
+      el("span", { html: icons.devices }),
+      el("span", {}, "Paired with a device"),
+    ],
+  );
+  qrBox.hidden = true;
+  pairedBox.hidden = true;
   const syncPanel = el("div", { class: "panel sync-panel" }, [
     el("div", { class: "row", style: { justifyContent: "space-between" } }, [
       el("span", { class: "label" }, "session relay"),
       syncStatusPill,
     ]),
     el("div", { class: "row", style: { marginTop: "12px" } }, [pairBtn]),
+    qrBox,
+    pairedBox,
     syncLog,
   ]);
   const syncSection = el("section", { class: "section-gap" }, [
@@ -413,7 +428,12 @@ export function initApp(): void {
     setStartButton("Starting", true);
     state.scanHandle = await startCamera(
       video,
-      (_text, parsed) => addScan(parsed),
+      (text, parsed) => {
+        // A scan of sweep's own join URL pairs instead of recording.
+        // Other QRs scan normally.
+        if (joinFromScan(text)) return;
+        addScan(parsed);
+      },
       (msg) => {
         state.errorMsg = msg;
         errorPar.textContent = msg;
@@ -588,6 +608,13 @@ export function initApp(): void {
 
   // ----- Session sync -----
   let syncHandle: SyncHandle | null = null;
+  // Which pairing panel to show:
+  //   waiting — host's QR is up, waiting for the first peer
+  //   paired  — the session reached 1:1, show "Paired with a device"
+  //   ended   — the peer left (or this socket was rejected): nothing to
+  //             show — the session is ephemeral, the user re-pairs
+  //   idle    — no pairing panel shown
+  let pairState: "idle" | "waiting" | "paired" | "ended" = "idle";
 
   function setSyncStatus(status: SyncStatus): void {
     syncStatusPill.dataset.status = status;
@@ -597,10 +624,15 @@ export function initApp(): void {
         : status === "connecting"
           ? "Connecting"
           : status === "closed"
-            ? "Closed"
+            ? "Disconnected"
             : "Off";
     clear(syncStatusPill);
     syncStatusPill.append(el("span", { class: "dot" }), document.createTextNode(label));
+  }
+
+  function renderPairPanel(): void {
+    qrBox.hidden = pairState !== "waiting";
+    pairedBox.hidden = pairState !== "paired";
   }
 
   function logSync(text: string): void {
@@ -612,24 +644,69 @@ export function initApp(): void {
   function handleSyncMessage(message: SyncMessage): void {
     if (message.type === "hello") {
       logSync(`hello from ${String(message.peerId).slice(0, 8)}`);
+      // A peer's hello proves the session reached 1:1 even if the relay's
+      // peer-joined notification raced ahead of us.
+      pairState = "paired";
+      renderPairPanel();
+    } else if (message.type === "peer-joined") {
+      // The relay announces the session reached 1:1 (second socket
+      // accepted). Reliable in both connection orders, so the host's QR
+      // auto-hides even when the peer connected first.
+      pairState = "paired";
+      logSync("peer joined — session is 1:1");
+      renderPairPanel();
+    } else if (message.type === "peer-left") {
+      // The other device disconnected (its socket closing is not visible
+      // locally). The session is ephemeral — no reconnect, re-pair instead.
+      pairState = "ended";
+      logSync("peer left — session ended");
+      renderPairPanel();
     }
   }
 
   function startSync(sessionId: string): void {
     if (syncHandle) syncHandle.close();
+    pairState = "idle";
     clear(syncLog);
     setSyncStatus("connecting");
+    renderPairPanel();
     syncHandle = connectSession(sessionId, {
       onMessage: handleSyncMessage,
       onStatus: setSyncStatus,
+      onRejected: (code, reason) => {
+        logSync(`rejected (${code}): ${reason} — this session already has two devices`);
+        pairState = "ended";
+        renderPairPanel();
+      },
     });
     logSync(`joined session ${sessionId.slice(0, 8)}`);
+  }
+
+  // Join a session from a scanned join URL. Returns true when the URL was
+  // a sweep join URL and a join was initiated, false otherwise.
+  function joinFromScan(raw: string): boolean {
+    const parsed = parseJoinUrl(raw, window.location.origin);
+    if (!parsed) return false;
+    startSync(parsed.sessionId);
+    // #3 (crypto) will read parsed.extra.k here to encrypt the session.
+    closeScanner();
+    logSync(`joined session from scan: ${parsed.sessionId.slice(0, 8)}`);
+    return true;
   }
 
   function pairDevice(): void {
     const sessionId = crypto.randomUUID();
     startSync(sessionId);
     const url = joinUrl(sessionId);
+    clear(qrBox);
+    const svg = el("div", { class: "qr-svg" });
+    svg.append(renderQrSvg(url));
+    qrBox.append(
+      svg,
+      el("p", { class: "qr-hint" }, "scan with sweep on another device"),
+    );
+    pairState = "waiting";
+    renderPairPanel();
     logSync(`share this link to pair: ${url}`);
   }
 

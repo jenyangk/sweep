@@ -4,16 +4,20 @@
 // SessionDO relay (worker/src/session.ts). The relay is a dumb echo pipe;
 // all protocol lives here on the client.
 //
-// Extension seams for the chain:
-//   - #2 (QR pairing, 1:1 enforcement): the message envelope already
-//     carries a `type` and `peerId`; join/leave and peer-count messages
-//     slot in without touching the pipe.
-//   - #3 (end-to-end encryption): the envelope gains an encrypted payload
-//     variant; the relay keeps relaying opaque messages.
+// Ticket #2 (QR pairing, 1:1 enforcement): the host renders a QR encoding
+// a join URL (buildJoinUrl); the phone scans it and joins the session.
+// buildJoinUrl / parseJoinUrl are the extension seam for #3 (end-to-end
+// encryption): #3 adds an AES key as an extra search param (?k=<key>), which
+// round-trips through the `extra` record untouched.
 //
 // This module is DOM-free — the UI wiring lives in app.ts.
 
 export type SyncStatus = "idle" | "connecting" | "connected" | "closed";
+
+// Close code the relay uses to reject a third socket to a full session
+// (worker/src/session.ts). Mirrored here so the UI can distinguish a
+// "session full" rejection from a generic disconnect.
+export const SESSION_FULL_CODE = 4001;
 
 export interface SyncMessage {
   type: string;
@@ -31,6 +35,8 @@ export interface SyncHandle {
 export interface SyncOptions {
   onMessage(message: SyncMessage): void;
   onStatus(status: SyncStatus): void;
+  /** The relay closed this socket because the session is full (1:1). */
+  onRejected?(code: number, reason: string): void;
 }
 
 // Open a WebSocket to the session relay for `sessionId` and send a hello
@@ -59,7 +65,12 @@ export function connectSession(
     }
   });
 
-  ws.addEventListener("close", () => options.onStatus("closed"));
+  ws.addEventListener("close", (event) => {
+    if (event.code === SESSION_FULL_CODE) {
+      options.onRejected?.(event.code, event.reason);
+    }
+    options.onStatus("closed");
+  });
   ws.addEventListener("error", () => options.onStatus("closed"));
 
   return {
@@ -76,11 +87,62 @@ export function connectSession(
   };
 }
 
-// The URL a second tab should open to join the same session.
-export function joinUrl(sessionId: string): string {
-  const url = new URL(window.location.href);
+// ----- Join-URL protocol (QR payload) -----
+//
+// The pairing QR encodes a join URL: <origin>/?s=<session-id>[&<extra>].
+// `extra` is opaque key/value map carried verbatim into the URL — the
+// extension seam for #3, which will add an AES key as ?k=<key>.
+
+export interface ParsedJoinUrl {
+  sessionId: string;
+  /** Extra search params beyond `s` (the #3 crypto seam). */
+  extra: Record<string, string>;
+}
+
+// Build the join URL that a pairing QR should encode. Any existing query
+// params on `origin` are preserved; `s` is set (or overwritten) and each
+// extra param is appended.
+export function buildJoinUrl(
+  origin: string,
+  sessionId: string,
+  extra: Record<string, string> = {},
+): string {
+  const url = new URL(origin);
   url.searchParams.set("s", sessionId);
+  for (const [key, value] of Object.entries(extra)) {
+    url.searchParams.set(key, value);
+  }
   return url.toString();
+}
+
+// Parse a scanned/built URL into its session-id and extra params, or null
+// if it is not a sweep join URL for `expectedOrigin` (origin match AND a
+// non-empty `s` param). Origin matching prevents a scan of some other
+// site's URL from being treated as a join.
+export function parseJoinUrl(
+  raw: string,
+  expectedOrigin: string,
+): ParsedJoinUrl | null {
+  let url: URL;
+  try {
+    url = new URL(raw);
+  } catch {
+    return null;
+  }
+  if (url.origin !== expectedOrigin) return null;
+  const sessionId = url.searchParams.get("s");
+  if (!sessionId) return null;
+  const extra: Record<string, string> = {};
+  url.searchParams.forEach((value, key) => {
+    if (key !== "s") extra[key] = value;
+  });
+  return { sessionId, extra };
+}
+
+// The URL a second tab should open to join the same session. DOM-bound
+// (uses window.location); the pure buildJoinUrl covers non-DOM callers.
+export function joinUrl(sessionId: string): string {
+  return buildJoinUrl(window.location.origin, sessionId);
 }
 
 // Session id from the URL (?s=<session-id>), if present.

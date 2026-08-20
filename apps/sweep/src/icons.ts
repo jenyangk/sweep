@@ -32,6 +32,12 @@ export const icons = {
   scan: wrap(
     `<path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><line x1="3" y1="12" x2="21" y2="12"/>`,
   ),
+  qr: wrap(
+    `<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3z"/><path d="M21 14v3h-3"/><path d="M14 21h3v-3"/>`,
+  ),
+  devices: wrap(
+    `<rect x="2" y="4" width="14" height="11" rx="2"/><path d="M7 19h4"/><path d="M9 15v4"/>`,
+  ),
 };
 
 export type IconName = keyof typeof icons;
