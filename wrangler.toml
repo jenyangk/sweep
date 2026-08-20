@@ -1,0 +1,38 @@
+# muniee — Cloudflare Worker configuration
+#
+# Single Worker serving multiple static sites from one assets directory:
+#   muniee.com              → public/landing/       (directory landing page)
+#   sweep.muniee.com        → public/sweep/         (batch QR scanner app)
+#   timeformats.muniee.com  → public/timeformats/   (time format converter)
+#   timezones.muniee.com    → public/timezones/     (timezone converter)
+#   cron.muniee.com          → public/cron/           (cron expression visualizer)
+#
+# The Worker (run_worker_first: true) inspects the hostname and rewrites
+# the pathname to /landing/*, /sweep/*, /timeformats/*, /timezones/*, or
+# /cron/* before fetching from ASSETS.
+#
+# Deploy: scripts/deploy.sh (builds all apps, assembles public/, runs wrangler deploy)
+# Local:  npm run dev (wrangler dev on localhost:8787)
+
+name = "muniee"
+main = "worker/src/index.ts"
+compatibility_date = "2025-04-01"
+workers_dev = true
+
+# Routes — all subdomains on the muniee.com zone.
+# The zone must exist in the Cloudflare account before deploying.
+# DNS records (A/AAAA/CNAME proxied) must be added in the dashboard.
+routes = [
+  { pattern = "muniee.com/*", zone_name = "muniee.com" },
+  { pattern = "sweep.muniee.com/*", zone_name = "muniee.com" },
+  { pattern = "timeformats.muniee.com/*", zone_name = "muniee.com" },
+  { pattern = "timezones.muniee.com/*", zone_name = "muniee.com" },
+  { pattern = "cron.muniee.com/*", zone_name = "muniee.com" },
+]
+
+[assets]
+directory = "./public"
+binding = "ASSETS"
+run_worker_first = true
+html_handling = "auto-trailing-slash"
+not_found_handling = "404-page"

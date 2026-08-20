@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0a0a0b" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+    <meta name="color-scheme" content="dark light" />
+
+    <!-- Theme bootstrap — runs before paint to prevent FOUC -->
+    <script data-timezones-theme-bootstrap>
+      (() => {
+        let theme;
+        try {
+          const stored = localStorage.getItem("timezones-theme");
+          if (stored === "light" || stored === "dark") theme = stored;
+        } catch {}
+        if (!theme) {
+          theme = window.matchMedia?.("(prefers-color-scheme: light)").matches
+            ? "light"
+            : "dark";
+        }
+        document.documentElement.dataset.theme = theme;
+        document.documentElement.style.colorScheme = theme;
+      })();
+    </script>
+
+    <!-- Satoshi font — self-hosted, preloaded for fast first paint -->
+    <link rel="preload" href="/fonts/satoshi-400.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/satoshi-700.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="/src/styles/global.css" />
+
+    <!-- Primary SEO -->
+    <title>timezones — compare times across timezones</title>
+    <meta
+      name="description"
+      content="Compare times across timezones. Add zones from the full IANA list, slide the clock, hover the hour grid to see every zone at once. Click the map to jump to a region. Runs in your browser, no server."
+    />
+    <meta
+      name="keywords"
+      content="timezone converter, time zone comparison, world clock, iana timezone, timezone grid, meeting planner, timezone map"
+    />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta name="application-name" content="timezones" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="timezones" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <link rel="canonical" href="https://timezones.muniee.com/" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="sitemap" href="/sitemap.xml" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:site_name" content="timezones" />
+    <meta property="og:url" content="https://timezones.muniee.com/" />
+    <meta property="og:title" content="timezones — compare times across timezones" />
+    <meta
+      property="og:description"
+      content="Full IANA timezone list, hour grid comparison, interactive map. In your browser, no server."
+    />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="timezones — compare times across timezones" />
+    <meta
+      name="twitter:description"
+      content="Full IANA timezone list, hour grid comparison, interactive map. In your browser, no server."
+    />
+
+    <!-- Structured data: WebApplication -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "@id": "https://timezones.muniee.com/#application",
+        "name": "timezones",
+        "url": "https://timezones.muniee.com/",
+        "description": "Compare times across timezones. Add zones from the full IANA list, slide the clock, hover the hour grid to see every zone at once. Click the map to jump to a region. All in your browser.",
+        "applicationCategory": "UtilitiesApplication",
+        "applicationSubCategory": "Timezone converter",
+        "operatingSystem": "Any",
+        "browserRequirements": "Requires a modern web browser with JavaScript enabled.",
+        "isAccessibleForFree": true,
+        "offers": {
+          "@type": "Offer",
+          "price": 0,
+          "priceCurrency": "USD"
+        },
+        "featureList": [
+          "Full IANA timezone list with search (around 400 zones)",
+          "Hour grid comparison: rows are zones, columns are hours",
+          "Hover any column to see every zone at that hour",
+          "Set any zone as home, offsets are relative to home",
+          "Click the map to add the nearest zone geographically",
+          "Day and night shading on the world map",
+          "12 or 24 hour display",
+          "Scrub through time or follow the live clock",
+          "All client-side, nothing uploaded",
+          "Dark and light theme"
+        ]
+      }
+    </script>
+
+    <!-- HowTo structured data for AEO -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "HowTo",
+        "name": "How to compare times across timezones",
+        "description": "Add timezones, slide the clock, and hover the hour grid to compare times across zones.",
+        "step": [
+          {
+            "@type": "HowToStep",
+            "name": "Add timezones",
+            "text": "Type in the search box to add timezones from the full IANA list, or click the map to add the nearest zone."
+          },
+          {
+            "@type": "HowToStep",
+            "name": "Slide the clock",
+            "text": "Change the selected time with the date and time input to compare zones at that moment, or press now to follow the live clock."
+          },
+          {
+            "@type": "HowToStep",
+            "name": "Hover the grid",
+            "text": "Move the mouse across the hour grid. The column you hover highlights across every zone so you can read off all the times at once."
+          },
+          {
+            "@type": "HowToStep",
+            "name": "Set home zone",
+            "text": "Click any non-home row to make that zone your home. Offset badges on other rows update to be relative to home."
+          }
+        ]
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root">
+      <!-- Server-rendered fallback for no-JS users and crawlers -->
+      <header class="sr-header">
+        <a href="https://muniee.com" class="mu-mark" aria-label="muniee">μ</a>
+        <a href="/" class="sr-logo">timezones</a>
+      </header>
+      <main class="sr-main">
+        <h1>Compare times across timezones.</h1>
+        <p>Add zones from the full IANA list, slide the clock, hover the hour grid to see every zone at once. Click the map to jump to a region. Runs in your browser, no server.</p>
+        <noscript>
+          <p style="margin-top:24px;color:#b89dff;font-weight:700">timezones needs JavaScript to compare times.</p>
+        </noscript>
+      </main>
+    </div>
+    <script type="module" src="/src/entry-client.ts"></script>
+  </body>
+</html>

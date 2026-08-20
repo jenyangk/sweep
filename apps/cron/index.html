@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0a0a0b" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+    <meta name="color-scheme" content="dark light" />
+
+    <!-- Theme bootstrap — runs before paint to prevent FOUC -->
+    <script data-cron-theme-bootstrap>
+      (() => {
+        let theme;
+        try {
+          const stored = localStorage.getItem("cron-theme");
+          if (stored === "light" || stored === "dark") theme = stored;
+        } catch {}
+        if (!theme) {
+          theme = window.matchMedia?.("(prefers-color-scheme: light)").matches
+            ? "light"
+            : "dark";
+        }
+        document.documentElement.dataset.theme = theme;
+        document.documentElement.style.colorScheme = theme;
+      })();
+    </script>
+
+    <!-- Satoshi font — self-hosted, preloaded for fast first paint -->
+    <link rel="preload" href="/fonts/satoshi-400.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/satoshi-700.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="/src/styles/global.css" />
+
+    <!-- Primary SEO -->
+    <title>cron — parse and visualize cron expressions</title>
+    <meta
+      name="description"
+      content="Parse and visualize cron expressions. Standard 5-field or 6-field with seconds. See next runs, human description, shareable links. Runs in your browser. No server, no signup."
+    />
+    <meta
+      name="keywords"
+      content="cron parser, cron expression, cron visualizer, cron schedule, cron next run, cron description, ncron"
+    />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta name="application-name" content="cron" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="cron" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <link rel="canonical" href="https://cron.muniee.com/" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="sitemap" href="/sitemap.xml" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:site_name" content="cron" />
+    <meta property="og:url" content="https://cron.muniee.com/" />
+    <meta property="og:title" content="cron — parse and visualize cron expressions" />
+    <meta
+      property="og:description"
+      content="Parse and visualize cron expressions. Standard 5-field or 6-field with seconds. See next runs, human description, shareable links. In your browser, no server."
+    />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="cron — parse and visualize cron expressions" />
+    <meta
+      name="twitter:description"
+      content="Parse and visualize cron expressions. Standard 5-field or 6-field with seconds. See next runs, human description, shareable links. In your browser, no server."
+    />
+
+    <!-- Structured data: WebApplication -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "@id": "https://cron.muniee.com/#application",
+        "name": "cron",
+        "url": "https://cron.muniee.com/",
+        "description": "Parse and visualize cron expressions. Standard 5-field or 6-field with seconds. See next runs, human description, shareable links. All in your browser.",
+        "applicationCategory": "UtilitiesApplication",
+        "applicationSubCategory": "Cron expression visualizer",
+        "operatingSystem": "Any",
+        "browserRequirements": "Requires a modern web browser with JavaScript enabled.",
+        "isAccessibleForFree": true,
+        "offers": {
+          "@type": "Offer",
+          "price": 0,
+          "priceCurrency": "USD"
+        },
+        "featureList": [
+          "Parse standard 5-field cron expressions",
+          "Parse 6-field cron expressions with seconds (ncron)",
+          "Human-readable description of any cron schedule",
+          "Next 5 run times, shown in your timezone",
+          "Shareable links that encode the expression in the URL",
+          "20 standard and 5 ncron example expressions",
+          "Field and special character reference",
+          "All client-side, nothing uploaded",
+          "Works on mobile and desktop browsers",
+          "Dark and light theme"
+        ]
+      }
+    </script>
+
+    <!-- HowTo structured data for AEO -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "HowTo",
+        "name": "How to visualize a cron expression",
+        "description": "Parse a cron expression to see its human description, next run times, and a shareable link.",
+        "step": [
+          {
+            "@type": "HowToStep",
+            "name": "Pick a mode",
+            "text": "Pick standard (5 fields) or ncron (6 fields with seconds)."
+          },
+          {
+            "@type": "HowToStep",
+            "name": "Enter an expression",
+            "text": "Type a cron expression or pick one of the examples."
+          },
+          {
+            "@type": "HowToStep",
+            "name": "Read the results",
+            "text": "See the human description, the next 5 run times, and copy a shareable link."
+          }
+        ]
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root">
+      <!-- Server-rendered fallback for no-JS users and crawlers -->
+      <header class="sr-header">
+        <a href="/" class="sr-logo">cron</a>
+      </header>
+      <main class="sr-main">
+        <h1>Parse cron expressions.</h1>
+        <p>Standard 5-field or 6-field with seconds. See next runs, human description, shareable links. In your browser. No server, no signup.</p>
+        <noscript>
+          <p style="margin-top:24px;color:#b89dff;font-weight:700">cron needs JavaScript to parse expressions.</p>
+        </noscript>
+      </main>
+    </div>
+    <script type="module" src="/src/entry-client.ts"></script>
+  </body>
+</html>

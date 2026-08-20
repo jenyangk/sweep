@@ -1,0 +1,469 @@
+/* ===== muniee landing — sketch + ascii system =====
+   Satoshi body, monospace labels, hand-drawn mu.
+   OKLCH tokens, dark default, light supported.
+   No gradient text. No em dashes. No puffery. */
+
+/* ----- Satoshi, self-hosted woff2 ----- */
+@font-face {
+  font-family: "Satoshi";
+  src: url("/fonts/satoshi-400.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Satoshi";
+  src: url("/fonts/satoshi-500.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Satoshi";
+  src: url("/fonts/satoshi-700.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Satoshi";
+  src: url("/fonts/satoshi-900.woff2") format("woff2");
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --mono: ui-monospace, "SF Mono", "Cascadia Code", "JetBrains Mono", Menlo,
+    Consolas, monospace;
+}
+
+/* ----- Theme tokens ----- */
+:root[data-theme="dark"] {
+  --bg: oklch(0.07 0 0);
+  --surface: oklch(0.11 0.002 279);
+  --surface-2: oklch(0.15 0.004 279);
+  --ink: oklch(0.97 0 0);
+  --muted: oklch(0.78 0.008 279);
+  --border: oklch(0.22 0.004 279);
+  --accent: oklch(0.68 0.18 279);
+  --accent-hover: oklch(0.72 0.19 279);
+  --accent-ink: oklch(0.1 0 0);
+  --danger: oklch(0.68 0.22 25);
+  --success: oklch(0.76 0.17 145);
+}
+
+:root[data-theme="light"] {
+  --bg: oklch(1 0 0);
+  --surface: oklch(0.98 0.002 279);
+  --surface-2: oklch(0.96 0.004 279);
+  --ink: oklch(0.16 0 0);
+  --muted: oklch(0.38 0.01 279);
+  --border: oklch(0.84 0.006 279);
+  --accent: oklch(0.48 0.2 279);
+  --accent-hover: oklch(0.42 0.2 279);
+  --accent-ink: oklch(0.99 0 0);
+  --danger: oklch(0.52 0.22 25);
+  --success: oklch(0.42 0.17 145);
+}
+
+/* ----- Reset ----- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  color: var(--ink);
+  background: var(--bg);
+  font-family: "Satoshi", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  font-feature-settings: "ss01" 1, "cv01" 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+h1 {
+  font-size: clamp(32px, 7vw, 56px);
+  text-wrap: balance;
+}
+
+h2 {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+p {
+  margin: 0;
+  line-height: 1.65;
+}
+
+a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+/* ----- Layout ----- */
+#root {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 56px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+  background: color-mix(in oklch, var(--bg) 88%, transparent);
+  backdrop-filter: blur(12px) saturate(1.4);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 7px;
+  text-decoration: none;
+  color: var(--ink);
+}
+
+.brand-mark {
+  font-family: var(--mono);
+  font-weight: 700;
+  font-size: 22px;
+  color: var(--accent);
+  line-height: 1;
+}
+
+.brand-name {
+  font-weight: 900;
+  font-size: 19px;
+  letter-spacing: -0.03em;
+}
+
+.theme-toggle {
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 14px;
+  padding: 8px 12px;
+  min-height: 44px;
+  min-width: 44px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease, transform 0.1s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.theme-toggle:hover {
+  background: var(--surface);
+}
+
+.theme-toggle:active {
+  transform: translateY(1px);
+}
+
+.site-main {
+  padding: 56px 0 64px;
+}
+
+/* ----- Section label (code-comment style) ----- */
+.section-label {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 0 0 20px;
+  font-weight: 400;
+}
+
+/* ----- Hero ----- */
+.hero {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  margin-bottom: 48px;
+}
+
+.hero-glyph {
+  flex-shrink: 0;
+}
+
+.mu-char {
+  font-size: 128px;
+  font-weight: 700;
+  color: var(--accent);
+  line-height: 1;
+  display: inline-block;
+  font-family: "Satoshi", sans-serif; /* default, will be overridden by JS */
+  animation: float 6s ease-in-out 1.8s infinite alternate;
+  transition: font-family 0.4s ease;
+  user-select: none;
+}
+
+@keyframes float {
+  to {
+    transform: translateY(-3px) rotate(-0.8deg);
+  }
+}
+
+@keyframes mu-fade {
+  0% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.94); }
+  100% { opacity: 1; transform: scale(1); }
+}
+.mu-char.switching {
+  animation: mu-fade 0.4s ease;
+}
+
+.hero-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.hero h1 {
+  font-weight: 900;
+}
+
+.cursor {
+  display: inline-block;
+  width: 0.55ch;
+  color: var(--accent);
+  animation: blink 1.05s step-end infinite;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.lede {
+  font-family: var(--mono);
+  color: var(--muted);
+  margin-top: 12px;
+  font-size: clamp(15px, 2.5vw, 18px);
+  line-height: 1.5;
+}
+
+/* ----- ASCII divider ----- */
+.divider {
+  text-align: center;
+  font-family: var(--mono);
+  font-size: 14px;
+  letter-spacing: 6px;
+  color: var(--border);
+  margin: 0 0 48px;
+  user-select: none;
+}
+
+/* ----- Apps section ----- */
+.app-grid {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 16px;
+}
+
+.app-card {
+  border: 2px dashed var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+  transition: border-color 0.2s ease, background 0.2s ease;
+  overflow: hidden;
+}
+
+.app-card:hover {
+  border-color: color-mix(in oklch, var(--accent) 55%, var(--border));
+  background: var(--surface-2);
+}
+
+.app-card:hover .app-link {
+  transform: translateY(-1px);
+}
+
+.app-link {
+  display: flex;
+  gap: 16px;
+  padding: 20px;
+  text-decoration: none;
+  color: var(--ink);
+  transition: transform 0.15s ease;
+}
+
+.app-icon {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent);
+}
+
+.app-icon svg {
+  width: 44px;
+  height: 44px;
+}
+
+.app-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.app-name {
+  font-weight: 900;
+  font-size: 18px;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.app-desc {
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.app-meta {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--accent);
+  margin-top: 4px;
+}
+
+/* Two-column grid on wider viewports for more than 2 apps. */
+@media (min-width: 640px) {
+  .app-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ----- Animations: staggered entrance ----- */
+.page-enter {
+  animation: fade-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.site-main > .page-enter:nth-child(1) {
+  animation-delay: 0s;
+}
+.site-main > .page-enter:nth-child(2) {
+  animation-delay: 0.08s;
+}
+.site-main > .page-enter:nth-child(3) {
+  animation-delay: 0.16s;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.row-enter {
+  animation: row-in 0.25s ease-out both;
+}
+
+.app-card:nth-child(1) { animation-delay: 0.12s; }
+.app-card:nth-child(2) { animation-delay: 0.18s; }
+.app-card:nth-child(3) { animation-delay: 0.24s; }
+.app-card:nth-child(4) { animation-delay: 0.30s; }
+
+@keyframes row-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ----- Focus ----- */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: inherit;
+}
+
+/* ----- Mobile ----- */
+@media (max-width: 520px) {
+  #root {
+    padding: 0 20px;
+  }
+  .hero {
+    gap: 20px;
+  }
+  .mu-char {
+    font-size: 72px;
+  }
+  .hero h1 {
+    font-size: clamp(28px, 8vw, 40px);
+  }
+  .app-link {
+    padding: 18px;
+  }
+}
+
+/* ----- Reduced motion ----- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .mu-char {
+    animation: none;
+  }
+  .cursor {
+    animation: none;
+    opacity: 1;
+  }
+}

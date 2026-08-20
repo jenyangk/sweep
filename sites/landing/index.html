@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0a0a0b" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+    <meta name="color-scheme" content="dark light" />
+
+    <!-- Theme bootstrap, runs before paint to prevent FOUC -->
+    <script data-muniee-theme-bootstrap>
+      (() => {
+        let theme;
+        try {
+          const stored = localStorage.getItem("muniee-theme");
+          if (stored === "light" || stored === "dark") theme = stored;
+        } catch {}
+        if (!theme) {
+          theme = window.matchMedia?.("(prefers-color-scheme: light)").matches
+            ? "light"
+            : "dark";
+        }
+        document.documentElement.dataset.theme = theme;
+        document.documentElement.style.colorScheme = theme;
+      })();
+    </script>
+
+    <!-- Satoshi font, self-hosted, preloaded for fast first paint -->
+    <link rel="preload" href="/fonts/satoshi-400.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/satoshi-700.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="/landing.css" />
+
+    <!-- Primary SEO -->
+    <title>muniee — μ means small</title>
+    <meta
+      name="description"
+      content="μ means small. muniee is small client-side web tools. no signup, no servers, no tracking. first tool: sweep, a batch QR scanner."
+    />
+    <meta
+      name="keywords"
+      content="muniee, mu, micro, web tools, client-side, browser apps, qr scanner, sweep, no signup, privacy"
+    />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta name="application-name" content="muniee" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="muniee" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <link rel="canonical" href="https://muniee.com/" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="sitemap" href="/sitemap.xml" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:site_name" content="muniee" />
+    <meta property="og:url" content="https://muniee.com/" />
+    <meta property="og:title" content="muniee — μ means small" />
+    <meta
+      property="og:description"
+      content="μ means small. small client-side web tools. no signup, no servers, no tracking."
+    />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="muniee — μ means small" />
+    <meta
+      name="twitter:description"
+      content="μ means small. small client-side web tools. no signup, no servers, no tracking."
+    />
+
+    <!-- Structured data: Organization -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "@id": "https://muniee.com/#organization",
+        "name": "muniee",
+        "url": "https://muniee.com/",
+        "logo": "https://muniee.com/favicon.svg",
+        "description": "muniee builds small client-side web tools. The name comes from mu, the scientific notation for micro. No signup, no servers, no tracking.",
+        "foundingDate": "2025"
+      }
+    </script>
+
+    <!-- Structured data: WebSite -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "@id": "https://muniee.com/#website",
+        "name": "muniee",
+        "url": "https://muniee.com/",
+        "description": "Small client-side web tools. mu means small.",
+        "publisher": { "@id": "https://muniee.com/#organization" }
+      }
+    </script>
+
+    <!-- Structured data: ItemList (app directory) for AEO -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "ItemList",
+        "name": "muniee tools",
+        "description": "Directory of tools in the muniee collection.",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "item": {
+              "@type": "WebApplication",
+              "name": "sweep",
+              "url": "https://sweep.muniee.com/",
+              "description": "Batch QR code scanner. Camera, image upload, or base64 paste. All client-side, nothing uploaded.",
+              "applicationCategory": "UtilitiesApplication",
+              "operatingSystem": "Any",
+              "isAccessibleForFree": true
+            }
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "item": {
+              "@type": "WebApplication",
+              "name": "timeformats",
+              "url": "https://timeformats.muniee.com/",
+              "description": "Convert a moment across 27 time formats. ISO, Unix, Julian, TAI, GPS, Windows FILETIME, and more. Click to copy.",
+              "applicationCategory": "UtilitiesApplication",
+              "operatingSystem": "Any",
+              "isAccessibleForFree": true
+            }
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "item": {
+              "@type": "WebApplication",
+              "name": "timezones",
+              "url": "https://timezones.muniee.com/",
+              "description": "Compare times across timezones. Add zones, see offsets, find overlap. 12 or 24 hour.",
+              "applicationCategory": "UtilitiesApplication",
+              "operatingSystem": "Any",
+              "isAccessibleForFree": true
+            }
+          },
+          {
+            "@type": "ListItem",
+            "position": 4,
+            "item": {
+              "@type": "WebApplication",
+              "name": "cron",
+              "url": "https://cron.muniee.com/",
+              "description": "Parse and visualize cron expressions. Standard 5-field or 6-field with seconds. See next runs, human description, shareable links.",
+              "applicationCategory": "UtilitiesApplication",
+              "operatingSystem": "Any",
+              "isAccessibleForFree": true
+            }
+          }
+        ]
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root">
+      <!-- Server-rendered fallback for no-JS users and crawlers -->
+      <header class="site-header">
+        <a href="/" class="brand" aria-label="muniee home">
+          <span class="brand-mark" aria-hidden="true">μ</span>
+          <span class="brand-name">muniee</span>
+        </a>
+        <button
+          class="theme-toggle"
+          type="button"
+          aria-label="Toggle dark and light theme"
+          data-theme-toggle
+        >
+          <span data-theme-icon></span>
+        </button>
+      </header>
+
+      <main class="site-main">
+        <section class="hero page-enter">
+          <div class="hero-glyph" aria-hidden="true">
+            <span class="mu-char">μ</span>
+          </div>
+          <div class="hero-text">
+            <h1>muniee<span class="cursor" aria-hidden="true">▋</span></h1>
+            <p class="lede">μ apps in your browser</p>
+          </div>
+        </section>
+
+        <div class="divider page-enter" role="separator" aria-hidden="true">· · ·</div>
+
+        <section class="apps-section page-enter" aria-labelledby="apps-heading">
+          <h2 id="apps-heading" class="section-label">// apps</h2>
+          <ul class="app-grid">
+            <li class="app-card row-enter">
+              <a href="https://sweep.muniee.com/" class="app-link">
+                <span class="app-icon" aria-hidden="true">
+                  <svg viewBox="0 0 32 32" fill="none" aria-hidden="true">
+                    <rect x="1" y="1" width="30" height="30" rx="7" fill="currentColor" fill-opacity="0.08"/>
+                    <g stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M12.5 5.5H5.5V12.5"/>
+                      <path d="M19.5 5.5H26.5V12.5"/>
+                      <path d="M12.5 26.5H5.5V19.5"/>
+                      <path d="M19.5 26.5H26.5V19.5"/>
+                    </g>
+                    <g fill="currentColor">
+                      <rect x="11" y="11" width="4.4" height="4.4" rx="1"/>
+                      <rect x="16.6" y="11" width="4.4" height="4.4" rx="1"/>
+                      <rect x="11" y="16.6" width="4.4" height="4.4" rx="1"/>
+                      <circle cx="19.2" cy="19.2" r="1.4"/>
+                      <circle cx="17.2" cy="19.2" r="1.4"/>
+                    </g>
+                    <line class="card-scan" x1="6.5" y1="16" x2="25.5" y2="16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                  </svg>
+                </span>
+                <span class="app-body">
+                  <span class="app-name">sweep</span>
+                  <span class="app-desc">
+                    batch QR scanner. camera, upload, or base64. runs in your
+                    browser, nothing uploaded.
+                  </span>
+                  <span class="app-meta">sweep.muniee.com</span>
+                </span>
+              </a>
+            </li>
+            <li class="app-card row-enter">
+              <a href="https://timeformats.muniee.com/" class="app-link">
+                <span class="app-icon" aria-hidden="true">
+                  <svg viewBox="0 0 32 32" fill="none" aria-hidden="true">
+                    <rect x="1" y="1" width="30" height="30" rx="7" fill="currentColor" fill-opacity="0.08"/>
+                    <circle cx="16" cy="16" r="10" stroke="currentColor" stroke-width="2.5"/>
+                    <line x1="16" y1="16" x2="16" y2="8.5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+                    <line x1="16" y1="16" x2="16" y2="11.5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+                  </svg>
+                </span>
+                <span class="app-body">
+                  <span class="app-name">timeformats</span>
+                  <span class="app-desc">
+                    convert a moment across 27 time formats. iso, unix, julian,
+                    tai, gps, windows filetime. click to copy.
+                  </span>
+                  <span class="app-meta">timeformats.muniee.com</span>
+                </span>
+              </a>
+            </li>
+            <li class="app-card row-enter">
+              <a href="https://timezones.muniee.com/" class="app-link">
+                <span class="app-icon" aria-hidden="true">
+                  <svg viewBox="0 0 32 32" fill="none" aria-hidden="true">
+                    <rect x="1" y="1" width="30" height="30" rx="7" fill="currentColor" fill-opacity="0.08"/>
+                    <circle cx="16" cy="16" r="10" stroke="currentColor" stroke-width="2.5"/>
+                    <ellipse cx="16" cy="16" rx="4" ry="10" stroke="currentColor" stroke-width="1.5" opacity="0.6"/>
+                    <line x1="6" y1="16" x2="26" y2="16" stroke="currentColor" stroke-width="1.5" opacity="0.6"/>
+                  </svg>
+                </span>
+                <span class="app-body">
+                  <span class="app-name">timezones</span>
+                  <span class="app-desc">
+                    compare times across timezones. add zones, see offsets, find
+                    overlap. 12 or 24 hour.
+                  </span>
+                  <span class="app-meta">timezones.muniee.com</span>
+                </span>
+              </a>
+            </li>
+            <li class="app-card row-enter">
+              <a href="https://cron.muniee.com/" class="app-link">
+                <span class="app-icon" aria-hidden="true">
+                  <svg viewBox="0 0 32 32" fill="none" aria-hidden="true">
+                    <rect x="1" y="1" width="30" height="30" rx="7" fill="currentColor" fill-opacity="0.08"/>
+                    <rect x="6" y="6" width="20" height="22" rx="3" stroke="currentColor" stroke-width="2.5"/>
+                    <g stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                      <line x1="11" y1="3" x2="11" y2="6"/>
+                      <line x1="21" y1="3" x2="21" y2="6"/>
+                    </g>
+                    <path d="M11 18 L14 21 L21 14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                  </svg>
+                </span>
+                <span class="app-body">
+                  <span class="app-name">cron</span>
+                  <span class="app-desc">
+                    parse and visualize cron expressions. standard or 6-field
+                    with seconds. next runs, description, shareable links.
+                  </span>
+                  <span class="app-meta">cron.muniee.com</span>
+                </span>
+              </a>
+            </li>
+          </ul>
+        </section>
+      </main>
+
+      <noscript>
+        <p style="margin:24px;color:var(--accent);font-weight:700">
+          some apps need JavaScript. this page works without it.
+        </p>
+      </noscript>
+    </div>
+    <script type="module" src="/landing.js"></script>
+  </body>
+</html>

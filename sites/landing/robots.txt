@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://muniee.com/sitemap.xml

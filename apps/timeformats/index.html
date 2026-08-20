@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0a0a0b" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+    <meta name="color-scheme" content="dark light" />
+
+    <!-- Theme bootstrap — runs before paint to prevent FOUC -->
+    <script data-timeformats-theme-bootstrap>
+      (() => {
+        let theme;
+        try {
+          const stored = localStorage.getItem("timeformats-theme");
+          if (stored === "light" || stored === "dark") theme = stored;
+        } catch {}
+        if (!theme) {
+          theme = window.matchMedia?.("(prefers-color-scheme: light)").matches
+            ? "light"
+            : "dark";
+        }
+        document.documentElement.dataset.theme = theme;
+        document.documentElement.style.colorScheme = theme;
+      })();
+    </script>
+
+    <!-- Satoshi font — self-hosted, preloaded for fast first paint -->
+    <link rel="preload" href="/fonts/satoshi-400.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/satoshi-700.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="/src/styles/global.css" />
+
+    <!-- Primary SEO -->
+    <title>timeformats — convert time across 27 formats</title>
+    <meta
+      name="description"
+      content="Convert a moment across 27 time formats. ISO 8601, Unix timestamps, Julian Date, TAI, GPS, Windows FILETIME, and more. Click to copy. Runs in your browser. No server, no signup."
+    />
+    <meta
+      name="keywords"
+      content="time format converter, iso 8601, unix timestamp, julian date, tai, gps time, windows filetime, time format"
+    />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta name="application-name" content="timeformats" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="timeformats" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <link rel="canonical" href="https://timeformats.muniee.com/" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="sitemap" href="/sitemap.xml" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:site_name" content="timeformats" />
+    <meta property="og:url" content="https://timeformats.muniee.com/" />
+    <meta property="og:title" content="timeformats — convert time across 27 formats" />
+    <meta
+      property="og:description"
+      content="Convert a moment across 27 time formats. ISO 8601, Unix, Julian Date, TAI, GPS, Windows FILETIME, and more. Click to copy. In your browser, no server."
+    />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="timeformats — convert time across 27 formats" />
+    <meta
+      name="twitter:description"
+      content="Convert a moment across 27 time formats. ISO 8601, Unix, Julian Date, TAI, GPS, Windows FILETIME, and more. In your browser, no server."
+    />
+
+    <!-- Structured data: WebApplication -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "@id": "https://timeformats.muniee.com/#application",
+        "name": "timeformats",
+        "url": "https://timeformats.muniee.com/",
+        "description": "Convert a moment across 27 time formats. ISO 8601, Unix timestamps, Julian Date, TAI, GPS, Windows FILETIME, and more. Click to copy. All in your browser.",
+        "applicationCategory": "UtilitiesApplication",
+        "applicationSubCategory": "Time format converter",
+        "operatingSystem": "Any",
+        "browserRequirements": "Requires a modern web browser with JavaScript enabled.",
+        "isAccessibleForFree": true,
+        "offers": {
+          "@type": "Offer",
+          "price": 0,
+          "priceCurrency": "USD"
+        },
+        "featureList": [
+          "Live clock showing the current time in 27 formats",
+          "Paste a value to convert a custom moment",
+          "ISO 8601, Unix timestamps, Julian Date, TAI, GPS, Windows FILETIME, and more",
+          "Click any format value to copy it to the clipboard",
+          "Filter formats by category",
+          "All client-side, nothing uploaded",
+          "Dark and light theme"
+        ]
+      }
+    </script>
+
+    <!-- HowTo structured data for AEO -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "HowTo",
+        "name": "How to convert time formats with timeformats",
+        "description": "Convert a moment across 27 time formats and copy any of them.",
+        "step": [
+          {
+            "@type": "HowToStep",
+            "name": "Set a time",
+            "text": "Watch the live clock or paste a value to set a custom time."
+          },
+          {
+            "@type": "HowToStep",
+            "name": "Filter by category",
+            "text": "Filter by category with the pills."
+          },
+          {
+            "@type": "HowToStep",
+            "name": "Copy a format",
+            "text": "Click any format value to copy it."
+          }
+        ]
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root">
+      <!-- Server-rendered fallback for no-JS users and crawlers -->
+      <header class="sr-header">
+        <a href="/" class="sr-logo">timeformats</a>
+      </header>
+      <main class="sr-main">
+        <h1>Convert time across 27 formats.</h1>
+        <p>ISO, Unix, Julian, TAI, GPS, Windows FILETIME, and more. Click any format to copy. Runs in your browser. No server, no signup.</p>
+        <noscript>
+          <p style="margin-top:24px;color:#b89dff;font-weight:700">timeformats needs JavaScript to convert time formats.</p>
+        </noscript>
+      </main>
+    </div>
+    <script type="module" src="/src/entry-client.ts"></script>
+  </body>
+</html>

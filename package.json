@@ -1,20 +1,27 @@
 {
-  "name": "sweep",
+  "name": "muniee",
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "sweep — fast batch QR scanner. Camera, upload, base64. Runs in your browser.",
+  "description": "muniee — a collection of small, sharp, client-side web apps. Served by a Cloudflare Worker with host-based routing.",
+  "workspaces": [
+    "apps/*",
+    "worker"
+  ],
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
-    "typecheck": "tsc --noEmit"
-  },
-  "dependencies": {
-    "jsqr": "^1.4.0"
+    "build:sweep": "npm run build -w @muniee/sweep",
+    "build:timeformats": "npm run build -w @muniee/timeformats",
+    "build:timezones": "npm run build -w @muniee/timezones",
+    "build:cron": "npm run build -w @muniee/cron",
+    "build:apps": "npm run build:sweep && npm run build:timeformats && npm run build:timezones && npm run build:cron",
+    "build": "npm run build:apps && node scripts/assemble.mjs",
+    "dev": "npm run build && wrangler dev",
+    "typecheck": "npm run typecheck -w @muniee/sweep && npm run typecheck -w @muniee/timeformats && npm run typecheck -w @muniee/timezones && npm run typecheck -w @muniee/cron && npm run typecheck -w @muniee/worker",
+    "deploy": "npm run build && wrangler deploy",
+    "deploy:dry-run": "npm run build && wrangler deploy --dry-run",
+    "clean": "node scripts/clean.mjs"
   },
   "devDependencies": {
-    "typescript": "^5.7.0",
-    "vite": "^7.0.0"
+    "wrangler": "^4.0.0"
   }
 }
