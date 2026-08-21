@@ -36,10 +36,6 @@
       name="description"
       content="Batch QR code scanner. Scan many QR codes in a row with your camera, upload images, or paste base64. Decodes URL, text, vCard, WiFi, base64. Runs in your browser. No server, no signup."
     />
-    <meta
-      name="keywords"
-      content="qr scanner, batch qr scanner, qr code reader, upload image qr, base64 qr decoder, qr scanner online"
-    />
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
     <meta name="application-name" content="sweep" />
@@ -49,7 +45,7 @@
     <meta name="mobile-web-app-capable" content="yes" />
     <link rel="canonical" href="https://sweep.muniee.com/" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="apple-touch-icon" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="sitemap" href="/sitemap.xml" />
 
@@ -63,14 +59,21 @@
       property="og:description"
       content="Scan many QR codes in a row with your camera, upload images, or paste base64. Decodes URL, text, vCard, WiFi, base64. In your browser, no server."
     />
+    <meta property="og:image" content="https://sweep.muniee.com/og.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="sweep — batch QR scanner. camera, upload, base64." />
 
     <!-- Twitter -->
-    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="sweep — batch QR scanner" />
     <meta
       name="twitter:description"
       content="Scan many QR codes in a row with your camera, upload images, or paste base64. In your browser, no server."
     />
+    <meta name="twitter:image" content="https://sweep.muniee.com/og.png" />
+    <meta name="twitter:image:alt" content="sweep — batch QR scanner. camera, upload, base64." />
 
     <!-- Structured data: WebApplication -->
     <script type="application/ld+json">
@@ -84,8 +87,10 @@
         "applicationCategory": "UtilitiesApplication",
         "applicationSubCategory": "QR code scanner",
         "operatingSystem": "Any",
+        "inLanguage": "en",
         "browserRequirements": "Requires a modern web browser with camera access (getUserMedia) and JavaScript enabled.",
         "isAccessibleForFree": true,
+        "publisher": { "@id": "https://muniee.com/#organization" },
         "offers": {
           "@type": "Offer",
           "price": 0,
@@ -131,6 +136,49 @@
             "@type": "HowToStep",
             "name": "Export results",
             "text": "Export results as CSV or TXT, or copy raw contents to clipboard."
+          }
+        ]
+      }
+    </script>
+
+    <!-- FAQPage structured data for AEO -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "inLanguage": "en",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is sweep?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "sweep is a free batch QR code scanner. Scan many QR codes in a row with your camera, upload image files, or paste base64-encoded image text. It runs entirely in your browser — nothing is uploaded."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Does sweep upload my QR codes to a server?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "No. sweep decodes QR codes entirely in your browser. No images or scanned data are uploaded to any server."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What QR content types does sweep decode?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "sweep decodes URLs, plain text, vCard contact cards, WiFi network credentials, and base64-encoded data."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Can I scan QR codes from an image file?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. Upload a PNG, JPG, WebP, or GIF image containing a QR code and sweep will decode it."
+            }
           }
         ]
       }

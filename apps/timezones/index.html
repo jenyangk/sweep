@@ -36,10 +36,6 @@
       name="description"
       content="Compare times across timezones. Add zones from the full IANA list, slide the clock, hover the hour grid to see every zone at once. Click the map to jump to a region. Runs in your browser, no server."
     />
-    <meta
-      name="keywords"
-      content="timezone converter, time zone comparison, world clock, iana timezone, timezone grid, meeting planner, timezone map"
-    />
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
     <meta name="application-name" content="timezones" />
@@ -49,7 +45,7 @@
     <meta name="mobile-web-app-capable" content="yes" />
     <link rel="canonical" href="https://timezones.muniee.com/" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="apple-touch-icon" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="sitemap" href="/sitemap.xml" />
 
@@ -63,14 +59,21 @@
       property="og:description"
       content="Full IANA timezone list, hour grid comparison, interactive map. In your browser, no server."
     />
+    <meta property="og:image" content="https://timezones.muniee.com/og.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="timezones — compare times across timezones." />
 
     <!-- Twitter -->
-    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="timezones — compare times across timezones" />
     <meta
       name="twitter:description"
       content="Full IANA timezone list, hour grid comparison, interactive map. In your browser, no server."
     />
+    <meta name="twitter:image" content="https://timezones.muniee.com/og.png" />
+    <meta name="twitter:image:alt" content="timezones — compare times across timezones." />
 
     <!-- Structured data: WebApplication -->
     <script type="application/ld+json">
@@ -84,8 +87,10 @@
         "applicationCategory": "UtilitiesApplication",
         "applicationSubCategory": "Timezone converter",
         "operatingSystem": "Any",
+        "inLanguage": "en",
         "browserRequirements": "Requires a modern web browser with JavaScript enabled.",
         "isAccessibleForFree": true,
+        "publisher": { "@id": "https://muniee.com/#organization" },
         "offers": {
           "@type": "Offer",
           "price": 0,
@@ -133,6 +138,49 @@
             "@type": "HowToStep",
             "name": "Set home zone",
             "text": "Click any non-home row to make that zone your home. Offset badges on other rows update to be relative to home."
+          }
+        ]
+      }
+    </script>
+
+    <!-- FAQPage structured data for AEO -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "inLanguage": "en",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is timezones?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "timezones is a free timezone comparison tool. Add zones from the full IANA list, see them side by side in an hour grid, and find meeting overlap times. It runs entirely in your browser."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How many timezones does timezones support?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "timezones includes the full IANA timezone list, around 400 zones, searchable by name."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Can I use timezones as a meeting planner?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. Add the timezones of all participants, slide the clock to a candidate time, and read off every zone at that hour from the grid to find overlapping working hours."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Does timezones work offline?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "timezones runs entirely in your browser. Once loaded, timezone comparison works without a network connection."
+            }
           }
         ]
       }

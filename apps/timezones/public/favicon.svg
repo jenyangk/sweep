@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="timezones">
+  <style>@media (prefers-reduced-motion: reduce) { animate, animateTransform { display: none; } }</style>
+  <rect width="32" height="32" rx="7" fill="#0a0a0b"/>
+  <!-- globe outline -->
+  <circle cx="16" cy="16" r="10" fill="none" stroke="#b89dff" stroke-width="2.5"/>
+  <!-- meridian: rx oscillates to suggest earth rotation -->
+  <ellipse cx="16" cy="16" rx="4" ry="10" fill="none" stroke="#b89dff" stroke-width="1.5" opacity="0.6">
+    <animate attributeName="rx" values="4;0.5;4" dur="8s" repeatCount="indefinite"/>
+  </ellipse>
+  <!-- equator -->
+  <line x1="6" y1="16" x2="26" y2="16" stroke="#b89dff" stroke-width="1.5" opacity="0.6"/>
+</svg>

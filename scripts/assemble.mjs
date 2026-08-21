@@ -10,7 +10,7 @@
 //
 // Run after `npm run build:apps`.
 
-import { cp, mkdir, rm, readdir, copyFile } from "node:fs/promises";
+import { cp, mkdir, rm, stat, copyFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { dirname, join, resolve } from "node:path";
 
@@ -26,9 +26,10 @@ const apps = [
   { name: "cron", dist: join(projectRoot, "apps", "cron", "dist") },
 ];
 
+// exists() uses stat (not readdir) so it returns true for both files and dirs.
 async function exists(p) {
   try {
-    await readdir(p);
+    await stat(p);
     return true;
   } catch {
     return false;
@@ -66,24 +67,27 @@ async function main() {
 
     // Copy index.html as 404.html so missing paths get a styled 404.
     // The Worker uses not_found_handling = "404-page".
-    try {
-      await copyFile(
-        join(publicDir, app.name, "index.html"),
-        join(publicDir, app.name, "404.html"),
-      );
-      console.log(`✓ created public/${app.name}/404.html (copy of index.html)`);
-    } catch {
-      // Non-fatal — 404-page handling will fall back to the nearest 404.html.
+    // Skip if a dedicated 404.html already exists (authored in apps/<app>/public/).
+    const app404 = join(publicDir, app.name, "404.html");
+    if (await exists(app404)) {
+      console.log(`✓ kept existing public/${app.name}/404.html (dedicated 404)`);
+    } else {
+      try {
+        await copyFile(join(publicDir, app.name, "index.html"), app404);
+        console.log(`✓ created public/${app.name}/404.html (copy of index.html)`);
+      } catch {
+        // Non-fatal — 404-page handling will fall back to the nearest 404.html.
+      }
     }
   }
 
-  // Create a 404.html for the landing site if one doesn't exist.
-  if (!(await exists(join(publicDir, "landing", "404.html")))) {
-    // The landing index.html works as a soft 404 for the root site.
-    await copyFile(
-      join(publicDir, "landing", "index.html"),
-      join(publicDir, "landing", "404.html"),
-    );
+  // Keep a 404.html for the landing site if one already exists (authored in
+  // sites/landing/). Only copy from index.html as a fallback.
+  const landing404 = join(publicDir, "landing", "404.html");
+  if (await exists(landing404)) {
+    console.log("✓ kept existing public/landing/404.html (dedicated 404)");
+  } else {
+    await copyFile(join(publicDir, "landing", "index.html"), landing404);
     console.log("✓ created public/landing/404.html (copy of index.html)");
   }
 

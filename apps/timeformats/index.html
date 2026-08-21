@@ -36,10 +36,6 @@
       name="description"
       content="Convert a moment across 27 time formats. ISO 8601, Unix timestamps, Julian Date, TAI, GPS, Windows FILETIME, and more. Click to copy. Runs in your browser. No server, no signup."
     />
-    <meta
-      name="keywords"
-      content="time format converter, iso 8601, unix timestamp, julian date, tai, gps time, windows filetime, time format"
-    />
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
     <meta name="application-name" content="timeformats" />
@@ -49,7 +45,7 @@
     <meta name="mobile-web-app-capable" content="yes" />
     <link rel="canonical" href="https://timeformats.muniee.com/" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="apple-touch-icon" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="sitemap" href="/sitemap.xml" />
 
@@ -63,14 +59,21 @@
       property="og:description"
       content="Convert a moment across 27 time formats. ISO 8601, Unix, Julian Date, TAI, GPS, Windows FILETIME, and more. Click to copy. In your browser, no server."
     />
+    <meta property="og:image" content="https://timeformats.muniee.com/og.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="timeformats — convert time across 27 formats." />
 
     <!-- Twitter -->
-    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="timeformats — convert time across 27 formats" />
     <meta
       name="twitter:description"
       content="Convert a moment across 27 time formats. ISO 8601, Unix, Julian Date, TAI, GPS, Windows FILETIME, and more. In your browser, no server."
     />
+    <meta name="twitter:image" content="https://timeformats.muniee.com/og.png" />
+    <meta name="twitter:image:alt" content="timeformats — convert time across 27 formats." />
 
     <!-- Structured data: WebApplication -->
     <script type="application/ld+json">
@@ -84,8 +87,10 @@
         "applicationCategory": "UtilitiesApplication",
         "applicationSubCategory": "Time format converter",
         "operatingSystem": "Any",
+        "inLanguage": "en",
         "browserRequirements": "Requires a modern web browser with JavaScript enabled.",
         "isAccessibleForFree": true,
+        "publisher": { "@id": "https://muniee.com/#organization" },
         "offers": {
           "@type": "Offer",
           "price": 0,
@@ -125,6 +130,49 @@
             "@type": "HowToStep",
             "name": "Copy a format",
             "text": "Click any format value to copy it."
+          }
+        ]
+      }
+    </script>
+
+    <!-- FAQPage structured data for AEO -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "inLanguage": "en",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What time formats does timeformats support?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "timeformats converts across 27 formats including ISO 8601, Unix timestamps, Julian Date, TAI, GPS, Windows FILETIME, and more."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Does timeformats work offline?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "timeformats runs entirely in your browser. Once loaded, conversions work without a network connection."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Can I copy a converted time value?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. Click any format value to copy it to your clipboard."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Is timeformats free?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes, timeformats is free to use with no account required."
+            }
           }
         ]
       }

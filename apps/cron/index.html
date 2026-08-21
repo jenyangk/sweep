@@ -36,10 +36,6 @@
       name="description"
       content="Parse and visualize cron expressions. Standard 5-field or 6-field with seconds. See next runs, human description, shareable links. Runs in your browser. No server, no signup."
     />
-    <meta
-      name="keywords"
-      content="cron parser, cron expression, cron visualizer, cron schedule, cron next run, cron description, ncron"
-    />
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
     <meta name="application-name" content="cron" />
@@ -49,7 +45,7 @@
     <meta name="mobile-web-app-capable" content="yes" />
     <link rel="canonical" href="https://cron.muniee.com/" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="apple-touch-icon" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="sitemap" href="/sitemap.xml" />
 
@@ -63,14 +59,21 @@
       property="og:description"
       content="Parse and visualize cron expressions. Standard 5-field or 6-field with seconds. See next runs, human description, shareable links. In your browser, no server."
     />
+    <meta property="og:image" content="https://cron.muniee.com/og.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="cron — parse and visualize cron expressions." />
 
     <!-- Twitter -->
-    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="cron — parse and visualize cron expressions" />
     <meta
       name="twitter:description"
       content="Parse and visualize cron expressions. Standard 5-field or 6-field with seconds. See next runs, human description, shareable links. In your browser, no server."
     />
+    <meta name="twitter:image" content="https://cron.muniee.com/og.png" />
+    <meta name="twitter:image:alt" content="cron — parse and visualize cron expressions." />
 
     <!-- Structured data: WebApplication -->
     <script type="application/ld+json">
@@ -84,8 +87,10 @@
         "applicationCategory": "UtilitiesApplication",
         "applicationSubCategory": "Cron expression visualizer",
         "operatingSystem": "Any",
+        "inLanguage": "en",
         "browserRequirements": "Requires a modern web browser with JavaScript enabled.",
         "isAccessibleForFree": true,
+        "publisher": { "@id": "https://muniee.com/#organization" },
         "offers": {
           "@type": "Offer",
           "price": 0,
@@ -128,6 +133,49 @@
             "@type": "HowToStep",
             "name": "Read the results",
             "text": "See the human description, the next 5 run times, and copy a shareable link."
+          }
+        ]
+      }
+    </script>
+
+    <!-- FAQPage structured data for AEO -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "inLanguage": "en",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is a cron expression?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "A cron expression is a string that describes a recurring schedule, typically with 5 fields: minute, hour, day of month, month, and day of week. The cron tool also supports a 6-field ncron format with seconds."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What does the cron tool show?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The cron tool shows a human-readable description of the schedule, the next 5 run times in your timezone, and a shareable link that encodes the expression."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Does the cron tool support 6-field expressions with seconds?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. Switch to ncron mode to parse 6-field cron expressions that include a leading seconds field."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Is the cron tool free?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes, the cron tool is free to use with no account required, and it runs entirely in your browser."
+            }
           }
         ]
       }

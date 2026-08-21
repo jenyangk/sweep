@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="cron">
+  <style>@media (prefers-reduced-motion: reduce) { animate, animateTransform { display: none; } }</style>
+  <rect width="32" height="32" rx="7" fill="#0a0a0b"/>
+  <!-- calendar page -->
+  <rect x="6" y="6" width="20" height="22" rx="3" fill="none" stroke="#b89dff" stroke-width="2.5"/>
+  <!-- binder tabs -->
+  <g stroke="#b89dff" stroke-width="2" stroke-linecap="round">
+    <line x1="11" y1="3" x2="11" y2="6"/>
+    <line x1="21" y1="3" x2="21" y2="6"/>
+  </g>
+  <!-- checkmark: draws in, holds, fades slightly, then resets and redraws — 3s loop -->
+  <path d="M11 18 L14 21 L21 14" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1" fill="none" stroke="#b89dff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <animate attributeName="stroke-dashoffset" values="1;1;0;0;1" keyTimes="0;0.15;0.35;0.9;0.95" dur="3s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="1;1;0.45;0.45;1" keyTimes="0;0.75;0.87;0.95;1" dur="3s" repeatCount="indefinite"/>
+  </path>
+</svg>

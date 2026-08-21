@@ -36,10 +36,6 @@
       name="description"
       content="μ means small. muniee is small client-side web tools. no signup, no servers, no tracking. first tool: sweep, a batch QR scanner."
     />
-    <meta
-      name="keywords"
-      content="muniee, mu, micro, web tools, client-side, browser apps, qr scanner, sweep, no signup, privacy"
-    />
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
     <meta name="application-name" content="muniee" />
@@ -49,7 +45,7 @@
     <meta name="mobile-web-app-capable" content="yes" />
     <link rel="canonical" href="https://muniee.com/" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="apple-touch-icon" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="sitemap" href="/sitemap.xml" />
 
@@ -63,14 +59,21 @@
       property="og:description"
       content="μ means small. small client-side web tools. no signup, no servers, no tracking."
     />
+    <meta property="og:image" content="https://muniee.com/og.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="muniee — μ means small. small client-side web tools." />
 
     <!-- Twitter -->
-    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="muniee — μ means small" />
     <meta
       name="twitter:description"
       content="μ means small. small client-side web tools. no signup, no servers, no tracking."
     />
+    <meta name="twitter:image" content="https://muniee.com/og.png" />
+    <meta name="twitter:image:alt" content="muniee — μ means small. small client-side web tools." />
 
     <!-- Structured data: Organization -->
     <script type="application/ld+json">
@@ -80,7 +83,7 @@
         "@id": "https://muniee.com/#organization",
         "name": "muniee",
         "url": "https://muniee.com/",
-        "logo": "https://muniee.com/favicon.svg",
+        "logo": "https://muniee.com/icon-512.png",
         "description": "muniee builds small client-side web tools. The name comes from mu, the scientific notation for micro. No signup, no servers, no tracking.",
         "foundingDate": "2025"
       }
@@ -95,6 +98,7 @@
         "name": "muniee",
         "url": "https://muniee.com/",
         "description": "Small client-side web tools. mu means small.",
+        "inLanguage": "en",
         "publisher": { "@id": "https://muniee.com/#organization" }
       }
     </script>
@@ -117,6 +121,7 @@
               "description": "Batch QR code scanner. Camera, image upload, or base64 paste. All client-side, nothing uploaded.",
               "applicationCategory": "UtilitiesApplication",
               "operatingSystem": "Any",
+              "inLanguage": "en",
               "isAccessibleForFree": true
             }
           },
@@ -130,6 +135,7 @@
               "description": "Convert a moment across 27 time formats. ISO, Unix, Julian, TAI, GPS, Windows FILETIME, and more. Click to copy.",
               "applicationCategory": "UtilitiesApplication",
               "operatingSystem": "Any",
+              "inLanguage": "en",
               "isAccessibleForFree": true
             }
           },
@@ -143,6 +149,7 @@
               "description": "Compare times across timezones. Add zones, see offsets, find overlap. 12 or 24 hour.",
               "applicationCategory": "UtilitiesApplication",
               "operatingSystem": "Any",
+              "inLanguage": "en",
               "isAccessibleForFree": true
             }
           },
@@ -156,7 +163,51 @@
               "description": "Parse and visualize cron expressions. Standard 5-field or 6-field with seconds. See next runs, human description, shareable links.",
               "applicationCategory": "UtilitiesApplication",
               "operatingSystem": "Any",
+              "inLanguage": "en",
               "isAccessibleForFree": true
+            }
+          }
+        ]
+      }
+    </script>
+
+    <!-- Structured data: FAQPage for AEO -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "inLanguage": "en",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is muniee?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "muniee is a collection of small client-side web tools. The name comes from mu (μ), the scientific notation for micro. All tools run entirely in your browser — no signup, no servers, no tracking."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Is muniee free to use?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. Every muniee tool is free to use with no account required."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Do muniee tools work offline?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Most tools run entirely in your browser. Once loaded, many work without a network connection."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What tools are in muniee?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "sweep (batch QR scanner), timeformats (27-format time converter), timezones (timezone comparison), and cron (cron expression visualizer)."
             }
           }
         ]
