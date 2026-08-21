@@ -19,3 +19,7 @@ worker/.tsbuildinfo
 .idea/
 .vscode/
 *.swp
+
+# Tooling scratch / screenshots
+.scratch/
+.openchamber/
