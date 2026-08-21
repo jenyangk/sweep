@@ -232,6 +232,8 @@ a {
   color: var(--accent);
   line-height: 1;
   display: inline-block;
+  width: 0.75em; /* fixed box so font cycling doesn't shift layout */
+  text-align: center;
   font-family: "Satoshi", sans-serif; /* default, will be overridden by JS */
   animation: float 6s ease-in-out 1.8s infinite alternate;
   transition: font-family 0.4s ease;

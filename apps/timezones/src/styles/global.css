@@ -522,11 +522,16 @@ main > .page-enter:nth-child(5) { animation-delay: 0.24s; z-index: 0; }
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 8px;
+  /* z-index high enough to sit above grid/map sections; the stacking context
+     is the .controls section (z-index 4 from page-enter), so this needs to
+     clear siblings within that context. 50 is plenty. */
   z-index: 50;
   max-height: 320px;
   overflow-y: auto;
   padding: 4px;
   box-shadow: 0 8px 24px color-mix(in oklch, var(--bg) 60%, transparent);
+  /* Guarantee an opaque background even if var(--surface) has alpha. */
+  background-color: var(--surface);
 }
 
 .search-item {
@@ -624,23 +629,29 @@ input[type="datetime-local"] {
   border-radius: 12px;
   overflow: hidden;
   background: var(--surface);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  /* taller map so the world is actually visible and explorable */
-  max-height: 420px;
+  /* Source SVG is 800×400 (2:1). Force the wrap to match so the map always
+     fills it edge-to-edge (no letterboxing) regardless of viewport width. */
+  aspect-ratio: 2 / 1;
+  max-height: 480px;
+  width: 100%;
+  margin-inline: auto;
 }
 .map-svg {
   width: 100%;
-  height: auto;
+  height: 100%;
   display: block;
-  max-height: 420px;
-  object-fit: contain;
   cursor: crosshair;
 }
-.map-grid line { stroke: var(--border); stroke-width: 0.5; opacity: 0.4; }
-.map-utc-band { stroke: var(--accent); stroke-width: 0.4; opacity: 0.18; }
-.map-utc-label { fill: var(--muted); font-family: var(--mono); font-size: 9px; font-weight: 700; }
+.map-grid line { stroke: var(--border); stroke-width: 0.5; opacity: 0.35; }
+.map-utc-band { stroke: var(--accent); stroke-width: 0.4; opacity: 0.12; }
+.map-utc-label {
+  fill: var(--muted);
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  opacity: 0.85;
+}
 .map-hit { fill: var(--bg); opacity: 0; }
 .map-land {
   /* visible land mass with real fill, not a ghost outline */
@@ -650,8 +661,32 @@ input[type="datetime-local"] {
   stroke-width: 0.5;
   stroke-opacity: 0.7;
 }
-.map-marker { fill: var(--accent); stroke: var(--bg); stroke-width: 2; transition: r 0.2s; }
-.map-marker:hover { r: 8; }
+/* Light-mode land/ocean contrast needed a serious boost. Push land darker
+   and the stroke inkier in light mode. */
+[data-theme="light"] .map-land {
+  fill: oklch(0.78 0.012 280);
+  stroke: oklch(0.55 0.025 280);
+  stroke-opacity: 0.85;
+}
+.map-marker {
+  fill: var(--accent);
+  stroke: var(--bg);
+  stroke-width: 2;
+  transition: r 0.15s ease-out;
+}
+.map-marker:hover { r: 7; }
+.map-marker.is-home {
+  fill: var(--ink);
+  stroke: var(--accent);
+  stroke-width: 2.5;
+}
+.map-marker-halo {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1;
+  opacity: 0.55;
+  pointer-events: none;
+}
 .map-cursor {
   fill: none;
   stroke: var(--accent);
@@ -660,9 +695,99 @@ input[type="datetime-local"] {
   pointer-events: none;
   transition: opacity 0.1s;
 }
-.map-terminator { stroke: var(--accent); stroke-width: 1; stroke-dasharray: 4 4; opacity: 0.7; }
-/* Day/night: night band clearly darker, not a faint tint */
-.map-night { fill: var(--ink); opacity: 0.22; }
+
+/* Curved terminator path (great circle). Soft accent stroke. */
+.map-terminator {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1;
+  stroke-dasharray: 3 4;
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+/* Twilight band: soft amber halo following the terminator curve. */
+.map-twilight {
+  fill: none;
+  stroke: oklch(0.72 0.14 55);
+  pointer-events: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.map-twilight-outer { stroke-width: 10; opacity: 0.08; }
+.map-twilight-inner { stroke-width: 4;  opacity: 0.18; }
+
+/* Daylight gradient overlay: warm sunlight on the day side. */
+.map-day {
+  fill: oklch(0.78 0.16 65);
+  /* per-rect fill-opacity set inline by the renderer */
+}
+
+/* Night-side darkening. Theme-relative: in light mode we dim less (the
+   underlying map is already pale); in dark mode we dim more. */
+.map-night-shade {
+  fill: oklch(0.04 0 0);
+  opacity: 0.42;
+  pointer-events: none;
+}
+[data-theme="light"] .map-night-shade { opacity: 0.28; }
+
+/* Subsolar glow + core dot. */
+.map-sun {
+  pointer-events: none;
+}
+.map-sun-core {
+  fill: oklch(0.95 0.18 80);
+  stroke: oklch(0.65 0.18 55);
+  stroke-width: 0.8;
+  pointer-events: none;
+}
+
+/* City dots + labels — three visual tiers. */
+.map-city-dot { fill: var(--ink); pointer-events: none; }
+.map-city-tier-1.map-city-dot { fill-opacity: 0.85; }
+.map-city-tier-2.map-city-dot { fill-opacity: 0.55; }
+.map-city-tier-3.map-city-dot { fill-opacity: 0.4; }
+
+.map-city-label {
+  fill: var(--ink);
+  font-family: var(--mono);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  pointer-events: none;
+  dominant-baseline: middle;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+/* Tier 1: anchors. Bold, slightly larger. */
+.map-city-tier-1.map-city-label {
+  font-size: 10px;
+  font-weight: 700;
+  fill: var(--ink);
+  letter-spacing: 0.02em;
+}
+/* Tier 2: regional majors — mid weight. */
+.map-city-tier-2.map-city-label {
+  font-size: 8.5px;
+  fill: color-mix(in oklch, var(--ink) 78%, var(--muted));
+}
+/* Tier 3: smaller regionals — quietest. */
+.map-city-tier-3.map-city-label {
+  font-size: 8px;
+  fill: var(--muted);
+  opacity: 0.85;
+}
+
+/* Density culling at narrow widths: hide the quietest tier on small screens,
+   then tier 2 on very small screens, leaving just the tier 1 anchors. */
+@media (max-width: 720px) {
+  .map-city-tier-3.map-city-dot,
+  .map-city-tier-3.map-city-label { display: none; }
+}
+@media (max-width: 480px) {
+  .map-city-tier-2.map-city-label { display: none; }
+  .map-city-tier-2.map-city-dot { display: none; }
+}
 
 .map-tooltip {
   position: absolute;
@@ -680,8 +805,60 @@ input[type="datetime-local"] {
   z-index: 5;
 }
 .map-tooltip[hidden] { display: none; }
+.map-tooltip-zone { font-weight: 700; color: var(--ink); }
 .map-tooltip-offset { font-weight: 700; color: var(--accent); }
+.map-tooltip-abbr { color: var(--muted); font-size: 11px; }
 .map-tooltip-hint { color: var(--muted); font-size: 10px; margin-top: 2px; }
+
+/* Tiny legend underneath the map explaining the visual marks. */
+.map-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 10px;
+  padding-inline: 2px;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+}
+.map-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.map-legend-swatch {
+  display: inline-block;
+  width: 12px;
+  height: 8px;
+  border-radius: 2px;
+  position: relative;
+}
+.map-legend-swatch-sun {
+  background: radial-gradient(circle at center,
+    oklch(0.95 0.18 80) 0%,
+    oklch(0.85 0.18 68) 40%,
+    transparent 100%);
+}
+.map-legend-swatch-twilight {
+  background: linear-gradient(90deg,
+    transparent 0%,
+    oklch(0.72 0.14 55 / 0.45) 50%,
+    transparent 100%);
+}
+.map-legend-swatch-home {
+  background: var(--ink);
+  border: 1.5px solid var(--accent);
+  border-radius: 50%;
+  width: 8px;
+  height: 8px;
+}
+.map-legend-swatch-marker {
+  background: var(--accent);
+  border-radius: 50%;
+  width: 8px;
+  height: 8px;
+}
 
 /* ===== Hour grid (primary view) =====
    WorldTimeBuddy-style: rows = zones, columns = hours.
@@ -803,7 +980,11 @@ input[type="datetime-local"] {
   white-space: nowrap;
   min-width: 56px;
 }
-.grid-date.is-date-change { color: var(--ink); font-weight: 700; }
+.grid-date.is-date-change {
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 9px;
+}
 
 /* Hour cells */
 .grid-cell {
@@ -825,9 +1006,11 @@ input[type="datetime-local"] {
 .grid-row.is-home .grid-cell.is-home { font-weight: 700; }
 
 .grid-cell.is-date-change {
-  font-size: 10px;
-  color: var(--muted);
-  font-weight: 700;
+  /* Keep the hour prominent even on day boundaries. Only the tiny date pill
+     marks the boundary — the hour number stays at full size and weight. */
+  font-size: 14px;
+  color: var(--ink);
+  font-weight: 500;
 }
 
 /* Time-of-day tonal bands. Subtle surface variation, not rainbow. */
@@ -864,6 +1047,20 @@ input[type="datetime-local"] {
   background: color-mix(in oklch, var(--accent) 22%, var(--surface));
 }
 
+/* Selected time range (shift+click to extend) */
+.grid-cell.is-range,
+.grid-date.is-range {
+  background: color-mix(in oklch, var(--accent) 18%, var(--surface));
+  color: var(--ink);
+}
+.grid-cell.is-range.is-now,
+.grid-date.is-range.is-now-col {
+  box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--accent) 60%, transparent);
+}
+.grid-row.is-home .grid-cell.is-range {
+  background: color-mix(in oklch, var(--accent) 26%, var(--surface));
+}
+
 /* Home row subtle accent tint */
 .grid-row.is-home {
   background: color-mix(in oklch, var(--accent) 4%, var(--surface));
@@ -882,3 +1079,78 @@ input[type="datetime-local"] {
   .grid-cell { min-height: 44px; font-size: 12px; min-width: 44px; }
   .grid-date { font-size: 9px; }
 }
+
+/* ===== Range summary (below the grid) ===== */
+.range-summary {
+  margin-top: 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.range-summary-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.range-summary-clear {
+  cursor: pointer;
+  color: var(--accent);
+  font-weight: 700;
+}
+.range-summary-clear:hover { text-decoration: underline; }
+.range-summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  border-top: 1px solid color-mix(in oklch, var(--border) 50%, transparent);
+  font-size: 13px;
+}
+.range-summary-row:first-of-type { border-top: none; }
+.range-summary-row.is-home {
+  background: color-mix(in oklch, var(--accent) 4%, var(--surface));
+  border-radius: 6px;
+  padding: 6px 8px;
+  margin: 0 -8px;
+}
+.range-summary-zone {
+  font-weight: 700;
+  color: var(--ink);
+  text-transform: lowercase;
+}
+.range-summary-times {
+  font-family: var(--mono);
+  font-weight: 500;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ===== Cell date pill (small day-of-week marker on day-boundary cells) ===== */
+.cell-date-pill {
+  font-size: 7px;
+  font-weight: 700;
+  color: var(--accent);
+  font-family: var(--mono);
+  margin-right: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.7;
+  vertical-align: top;
+  position: relative;
+  top: -4px;
+}
+
+/* ===== Row label is the home-zone selector ===== */
+.grid-row:not(.is-home) .row-label { cursor: pointer; }
+.grid-row:not(.is-home) .row-label:hover {
+  background: color-mix(in oklch, var(--accent) 8%, var(--surface));
+}
+.grid-row:not(.is-home) .row-label:hover .row-city-name { color: var(--accent); }
